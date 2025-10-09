@@ -7,7 +7,7 @@ export function Footer({ t }: { t?: any }) {
     <footer className="w-full bg-secondary/50">
       <div className="container mx-auto px-4 md:px-6 py-12">
         <div className="flex flex-col items-center text-center gap-6">
-          <Logo  width={225} height={56} />
+          <Logo  width={112.5} height={28} />
           <p className="mt-2 text-sm text-muted-foreground max-w-xs">
             Tu socio de confianza en construcción y reformas.
           </p>
