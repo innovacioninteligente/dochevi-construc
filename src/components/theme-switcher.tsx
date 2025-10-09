@@ -10,10 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useTheme } from "next-themes"
-import { Monitor, Moon, Sun, Palette } from "lucide-react"
+import { Moon, Sun, Palette } from "lucide-react"
 
 export function ThemeSwitcher() {
-  const { setTheme, theme, themes } = useTheme()
+  const { setTheme, theme } = useTheme()
 
   const themeColors = [
     { name: "Blue", class: "theme-blue" },
@@ -21,21 +21,17 @@ export function ThemeSwitcher() {
     { name: "Orange", class: "theme-orange" },
   ]
 
-  const handleSetTheme = (newTheme: string) => {
-    const currentColorScheme = theme?.startsWith('dark-') ? 'dark-' : '';
-    const baseTheme = newTheme.split('-')[1] || newTheme;
-    setTheme(`${currentColorScheme}${baseTheme}`);
-  }
+  const isDarkMode = theme?.startsWith('dark-')
+  const currentBaseTheme = isDarkMode ? theme.substring(5) : theme
 
   const toggleDarkMode = () => {
-    const isDark = theme?.startsWith('dark-');
-    const baseTheme = theme?.replace('dark-', '') || 'theme-blue';
-    setTheme(isDark ? baseTheme : `dark-${baseTheme}`);
+    const baseTheme = currentBaseTheme || "theme-blue"
+    setTheme(isDarkMode ? baseTheme : `dark-${baseTheme}`)
   }
 
-  const isDarkMode = theme?.startsWith('dark-');
-  const currentBaseTheme = theme?.replace('dark-', '');
-
+  const handleSetBaseTheme = (newBaseTheme: string) => {
+    setTheme(isDarkMode ? `dark-${newBaseTheme}` : newBaseTheme)
+  }
 
   return (
     <DropdownMenu>
@@ -50,16 +46,20 @@ export function ThemeSwitcher() {
         {themeColors.map((color) => (
           <DropdownMenuItem
             key={color.class}
-            onClick={() => setTheme(isDarkMode ? `dark-${color.class}` : color.class)}
+            onClick={() => handleSetBaseTheme(color.class)}
             disabled={currentBaseTheme === color.class}
           >
             {color.name}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-         <DropdownMenuItem onClick={toggleDarkMode}>
-            {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-            <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+        <DropdownMenuItem onClick={toggleDarkMode}>
+          {isDarkMode ? (
+            <Sun className="mr-2 h-4 w-4" />
+          ) : (
+            <Moon className="mr-2 h-4 w-4" />
+          )}
+          <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root, .theme-blue {
+  :root,
+  .theme-blue {
     --background: 48 33% 98%;
     --foreground: 215 28% 17%;
     --card: 48 33% 98%;
@@ -30,11 +31,11 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
-  
+
   .dark.theme-blue {
     --background: 215 28% 17%;
     --foreground: 48 33% 98%;
-    --card: 215_28% 17%;
+    --card: 215 28% 17%;
     --card-foreground: 48 33% 98%;
     --popover: 215 28% 17%;
     --popover-foreground: 48 33% 98%;
@@ -43,7 +44,7 @@
     --secondary: 215 25% 25%;
     --secondary-foreground: 48 33% 98%;
     --muted: 215 25% 25%;
-    _--muted-foreground: 215 20% 65%;
+    --muted-foreground: 215 20% 65%;
     --accent: 38 92% 50%;
     --accent-foreground: 215 28% 17%;
     --destructive: 0 62.8% 30.6%;
@@ -145,7 +146,6 @@
     --input: 24 10% 25%;
     --ring: 14.5 90.3% 49.2%;
   }
-
 }
 
 @layer base {
@@ -156,7 +156,7 @@
     @apply bg-background text-foreground;
   }
   .container-limited {
-      @apply container mx-auto w-full md:w-[80vw] px-4 md:px-6;
+    @apply container mx-auto w-full md:w-[80vw] px-4 md:px-6;
   }
   .cta-pulse {
     @apply animate-pulse-shadow;
