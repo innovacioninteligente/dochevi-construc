@@ -6,7 +6,7 @@ export function Logo({ className, width = 48, height = 48 }: { className?: strin
   return (
     <Link href="/" className={cn("flex items-center gap-2 text-xl font-bold font-headline", className)}>
       <Building className="text-primary" style={{ width, height }} />
-      <span className="hidden md:inline-block">Nombre de empresa</span>
+      <span>Nombre de empresa</span>
     </Link>
   );
 }
