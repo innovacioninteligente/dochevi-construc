@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/auth-context';
 import i18nConfig from '../../../i18nConfig';
 import { notFound } from 'next/navigation';
 import { ContactFab } from '@/components/contact-fab';
+import { ThemeProvider } from "next-themes";
 
 const siteConfig = {
   name: 'Nombre de empresa',
@@ -70,11 +71,18 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('font-body antialiased min-h-screen bg-background flex flex-col')}>
-        <AuthProvider>
-          {children}
-          <Toaster />
-          <ContactFab />
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="theme-blue"
+          enableSystem={false}
+          themes={['theme-blue', 'dark-theme-blue', 'theme-green', 'dark-theme-green', 'theme-orange', 'dark-theme-orange']}
+        >
+          <AuthProvider>
+            {children}
+            <Toaster />
+            <ContactFab />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

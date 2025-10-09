@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sheet';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { ThemeSwitcher } from '../theme-switcher';
 
 export function Header({ t }: { t: any }) {
   const { user } = useAuth();
@@ -35,10 +36,10 @@ export function Header({ t }: { t: any }) {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container-limited flex h-16 items-center">
         <div className="md:hidden">
-          <Logo width={63} height={15.75} />
+          <Logo width={31.5} height={7.875} />
         </div>
         <div className="hidden md:block">
-          <Logo width={24} height={24} />
+          <Logo width={12} height={12} />
         </div>
         <nav className="hidden md:flex items-center gap-6 ml-10 text-sm font-medium">
           {navLinks.map((link) => (
@@ -47,7 +48,8 @@ export function Header({ t }: { t: any }) {
             </Link>
           ))}
         </nav>
-        <div className="flex flex-1 items-center justify-end gap-4">
+        <div className="flex flex-1 items-center justify-end gap-2">
+          <ThemeSwitcher />
           <LanguageSwitcher />
           {user ? (
             <UserNav t={t.header.userNav} />
