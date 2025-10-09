@@ -84,7 +84,7 @@ export function QuickBudgetForm({ t }: { t: any; }) {
       const db = getSafeDb();
       const mailCollection = collection(db, 'mail');
       await addDoc(mailCollection, {
-        to: ['goalcasor@gmail.com', 'yakusl2003@gmail.com'],
+        to: ['your-email@example.com'], // CHANGE THIS
         message: {
             subject: 'Nueva Solicitud de Presupuesto Rápido',
             html: `
@@ -137,7 +137,7 @@ export function QuickBudgetForm({ t }: { t: any; }) {
   
   if (isSubmitted) {
     const isPool = watchRenovationType === 'pool';
-    const reviewLink = "https://maps.app.goo.gl/asg19xm4g9SZ8iUQ9";
+    const reviewLink = "#"; // Replace with your GMB review link
 
     return (
         <div className="text-center max-w-2xl mx-auto">

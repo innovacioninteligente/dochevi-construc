@@ -13,8 +13,8 @@
     },
     "about": {
         "title": "Über uns",
-        "description1": "YAKU BAU UND POOLS sind ein auf Renovierungen und den Bau von Schwimmbädern auf Mallorca spezialisiertes Unternehmen. Wir sind seit 2003 in der Branche tätig und garantieren Ihnen höchste Seriosität, Verantwortung, Engagement und Professionalität, um Ihnen die besten Ergebnisse bei unseren Arbeiten zu liefern.",
-        "description2": "Unser Ruf basiert auf der Zufriedenheit unserer Kunden, weshalb wir uns bemühen, bei jedem Projekt die Erwartungen zu übertreffen. Yaku Bau und Pools ist die ideale Wahl für alle, die Qualität, Professionalität und Engagement beim Bau von Schwimmbädern auf Mallorca suchen.",
+        "description1": "Wir sind ein auf Renovierungen und Bau spezialisiertes Unternehmen. Wir sind seit 2003 in der Branche tätig und garantieren Ihnen höchste Seriosität, Verantwortung, Engagement und Professionalität, um Ihnen die besten Ergebnisse bei unseren Arbeiten zu liefern.",
+        "description2": "Unser Ruf basiert auf der Zufriedenheit unserer Kunden, weshalb wir uns bemühen, bei jedem Projekt die Erwartungen zu übertreffen. Unser Unternehmen ist die ideale Wahl für alle, die Qualität, Professionalität und Engagement suchen.",
         "reason1": "Erfahrene Fachleute",
         "reason2": "Qualität und Detailgenauigkeit",
         "reason3": "Transparenz und Engagement"
@@ -95,11 +95,9 @@
     "testimonials": {
         "title": "Was unsere Kunden sagen",
         "subtitle": "Wir sind stolz auf unsere Arbeit und die Zufriedenheit derer, die uns vertrauen.",
-        "testimonial1": "Tadellose Arbeit von Anfang bis Ende. Das Team war professionell, sauber und hat die Fristen eingehalten. Mein neuer Pool ist ein wahrgewordener Traum!",
-        "customer": "Zufriedener Kunde",
-        "testimonial2": "Wir haben Yaku Construcciones für unser komplettes Renovierungsprojekt hier auf Mallorca beauftragt und die Erfahrung war in jeder Hinsicht 5 Sterne wert. Die Qualität der Bauausführung ist tadellos, aber was ich am meisten hervorhebe, ist ihre Effizienz und die Einhaltung der Fristen. Sie sind wahre Bauexperten auf der Insel. Wenn Sie ein zuverlässiges Bauunternehmen auf Mallorca suchen, das sein Handwerk versteht, sind Sie hier richtig.",
+        "testimonial2": "Wir haben das Unternehmen für unser komplettes Renovierungsprojekt beauftragt und die Erfahrung war in jeder Hinsicht 5 Sterne wert. Die Qualität der Bauausführung ist tadellos, aber was ich am meisten hervorhebe, ist ihre Effizienz und die Einhaltung der Fristen. Sie sind wahre Bauexperten. Wenn Sie ein zuverlässiges Bauunternehmen suchen, das sein Handwerk versteht, sind Sie hier richtig.",
         "customer2": "Gerson Agredo",
-        "testimonial3": "Wir haben Yaku Construcciones für unser komplettes Renovierungsprojekt hier auf Mallorca beauftragt und die Erfahrung war in jeder Hinsicht 5 Sterne wert. Die Qualität der Bauausführung ist tadellos, aber was ich am meisten hervorhebe, ist ihre Effizienz und die Einhaltung der Fristen. Sie sind wahre Bauexperten auf der Insel. Wenn Sie ein zuverlässiges Bauunternehmen auf Mallorca suchen, das sein Handwerk versteht, sind Sie hier richtig.",
+        "testimonial3": "Wir haben das Unternehmen für unser komplettes Renovierungsprojekt beauftragt und die Erfahrung war in jeder Hinsicht 5 Sterne wert. Die Qualität der Bauausführung ist tadellos, aber was ich am meisten hervorhebe, ist ihre Effizienz und die Einhaltung der Fristen. Sie sind wahre Bauexperten. Wenn Sie ein zuverlässiges Bauunternehmen suchen, das sein Handwerk versteht, sind Sie hier richtig.",
         "customer3": "Alex Castells",
         "project": "Komplettsanierung"
     },

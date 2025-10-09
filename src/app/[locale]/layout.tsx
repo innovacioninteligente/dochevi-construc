@@ -8,10 +8,10 @@ import { notFound } from 'next/navigation';
 import { ContactFab } from '@/components/contact-fab';
 
 const siteConfig = {
-  name: 'Yaku Construcciones',
+  name: 'Nombre de empresa',
   description: 'Soluciones expertas de construcción, reformas, piscinas y más. Calidad y confianza para tu hogar o negocio.',
-  url: 'https://yaku-construcciones.com', // Replace with your actual domain
-  ogImage: 'https://firebasestorage.googleapis.com/v0/b/local-digital-eye.firebasestorage.app/o/business%2Fyaku%2Ficon.png?alt=media&token=1803ca86-deff-4e44-84ea-20f1fae4cbf4',
+  url: 'https://example.com', // Replace with your actual domain
+  ogImage: '', // Replace with your actual OG image URL
 };
 
 export const metadata: Metadata = {
@@ -59,12 +59,12 @@ export default function RootLayout({
     notFound();
   }
   
-  const faviconUrl = "https://firebasestorage.googleapis.com/v0/b/local-digital-eye.firebasestorage.app/o/business%2Fyaku%2Ficon.png?alt=media&token=1803ca86-deff-4e44-84ea-20f1fae4cbf4";
+  const faviconUrl = ""; // Replace with your favicon URL
 
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <link rel="icon" href={faviconUrl} sizes="any" />
+        {faviconUrl && <link rel="icon" href={faviconUrl} sizes="any" />}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />

@@ -17,14 +17,14 @@ export function Footer({ t }: { t?: any }) {
           </div>
           {t && (
              <div className='mt-4'>
-                <a href="https://seo.consultoria.systems//negocio/ChIJD7w_Ef2TlxIRQSqCitTX7Gk" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary hover:underline">
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary hover:underline">
                   {t.reviewLink}
                 </a>
               </div>
           )}
         </div>
         <div className="mt-8 border-t pt-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {currentYear} Yaku Construcciones. Todos los derechos reservados.</p>
+          <p>&copy; {currentYear} Nombre de empresa. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

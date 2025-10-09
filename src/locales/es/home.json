@@ -13,8 +13,8 @@
     },
     "about": {
         "title": "Sobre Nosotros",
-        "description1": "CONSTRUCCIÓN Y PISCINAS YAKU somos una empresa especializada en reformas y construcción de piscinas en Mallorca. Estamos desde el 2003 en el sector, por lo que te garantizamos que recibirás de nuestra parte la máxima seriedad, responsabilidad, compromiso y profesionalidad, brindándote los mejores resultados en los trabajos que realizamos.",
-        "description2": "Nuestra reputación se basa en la satisfacción del cliente, por lo que nos esforzamos por superar las expectativas en cada proyecto que emprendemos. Construcción y Piscinas Yaku es la elección ideal para aquellos que buscan calidad, profesionalismo y compromiso.",
+        "description1": "Somos una empresa especializada en reformas y construcción. Estamos desde el 2003 en el sector, por lo que te garantizamos que recibirás de nuestra parte la máxima seriedad, responsabilidad, compromiso y profesionalidad, brindándote los mejores resultados en los trabajos que realizamos.",
+        "description2": "Nuestra reputación se basa en la satisfacción del cliente, por lo que nos esforzamos por superar las expectativas en cada proyecto que emprendemos. Nuestra empresa es la elección ideal para aquellos que buscan calidad, profesionalismo y compromiso.",
         "reason1": "Profesionales Experimentados",
         "reason2": "Calidad y Atención al Detalle",
         "reason3": "Transparencia y Compromiso"
@@ -95,11 +95,9 @@
     "testimonials": {
         "title": "La opinión de nuestros clientes",
         "subtitle": "Nos enorgullece el trabajo que hacemos y la satisfacción de quienes confían en nosotros.",
-        "testimonial1": "Un trabajo impecable de principio a fin. El equipo fue profesional, limpio y cumplió con los plazos. ¡Mi nueva piscina es un sueño hecho realidad!",
-        "customer": "Cliente Satisfecho",
-        "testimonial2": "Contratamos a Yaku Construcciones para nuestro proyecto de reforma integral aquí en Mallorca y la experiencia fue de 5 estrellas en todo sentido. La calidad de la construcción es impecable, pero lo que más destaco es su eficiencia y el respeto por los plazos. Son verdaderos expertos en edificación en la isla. Si buscas una constructora en Mallorca de confianza que sepa lo que hace, esta es la opción.",
+        "testimonial2": "Contratamos a la empresa para nuestro proyecto de reforma integral y la experiencia fue de 5 estrellas en todo sentido. La calidad de la construcción es impecable, pero lo que más destaco es su eficiencia y el respeto por los plazos. Son verdaderos expertos en edificación. Si buscas una constructora de confianza que sepa lo que hace, esta es la opción.",
         "customer2": "Gerson Agredo",
-        "testimonial3": "Contratamos a Yaku Construcciones para nuestro proyecto de reforma integral aquí en Mallorca y la experiencia fue de 5 estrellas en todo sentido. La calidad de la construcción es impecable, pero lo que más destaco es su eficiencia y el respeto por los plazos. Son verdaderos expertos en edificación en la isla. Si buscas una constructora en Mallorca de confianza que sepa lo que hace, esta es la opción.",
+        "testimonial3": "Contratamos a la empresa para nuestro proyecto de reforma integral y la experiencia fue de 5 estrellas en todo sentido. La calidad de la construcción es impecable, pero lo que más destaco es su eficiencia y el respeto por los plazos. Son verdaderos expertos en edificación. Si buscas una constructora de confianza que sepa lo que hace, esta es la opción.",
         "customer3": "Alex Castells",
         "project": "Reforma Integral"
     },
