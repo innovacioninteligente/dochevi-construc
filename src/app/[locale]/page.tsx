@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default async function Home() {
   const imageUrl = "https://firebasestorage.googleapis.com/v0/b/local-digital-eye.firebasestorage.app/o/business%2Fdochevi%2F218434-P0LL3W-528.jpg?alt=media&token=c3092520-0d13-4b4d-9cb8-9ae6677893f2";
@@ -21,6 +23,9 @@ export default async function Home() {
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
           Estamos trabajando para traerte una experiencia increíble. ¡Vuelve pronto!
         </p>
+        <Button asChild>
+          <Link href="/hoja-de-ruta">Ver Hoja de Ruta</Link>
+        </Button>
       </div>
     </main>
   );
