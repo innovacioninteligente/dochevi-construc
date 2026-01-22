@@ -1,12 +1,31 @@
 import type { Metadata } from 'next';
+import { ThemeProvider } from "next-themes";
 import '../globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/auth-context';
 import i18nConfig from '../../../i18nConfig';
 import { notFound } from 'next/navigation';
-import { ContactFab } from '@/components/contact-fab';
-import { ThemeProvider } from "next-themes";
+import { getDictionary } from '@/lib/dictionaries';
+
+import localFont from 'next/font/local';
+
+const dastin = localFont({
+  src: [
+    {
+      path: '../../../public/fonts/Dastin.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/Dastin.woff',
+      weight: '400', // Woff fallback
+      style: 'normal',
+    },
+  ],
+  variable: '--font-headline',
+  display: 'swap',
+});
 
 const siteConfig = {
   name: 'Nombre de empresa',
@@ -21,7 +40,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  
+
   openGraph: {
     type: 'website',
     locale: 'es_ES',
@@ -49,17 +68,20 @@ export function generateStaticParams() {
   return i18nConfig.locales.map(locale => ({ locale }));
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  params: { locale }
+  params
 }: {
   children: React.ReactNode;
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params;
+
   if (!i18nConfig.locales.includes(locale)) {
     notFound();
   }
-  
+
+  const dict = await getDictionary(locale as any);
   const faviconUrl = ""; // Replace with your favicon URL
 
   return (
@@ -70,17 +92,16 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('font-body antialiased min-h-screen bg-background flex flex-col')}>
+      <body className={cn('font-body antialiased min-h-screen bg-background flex flex-col', dastin.variable)}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="theme-blue"
+          defaultTheme="theme-luxury"
           enableSystem={false}
           themes={['theme-blue', 'dark-theme-blue', 'theme-green', 'dark-theme-green', 'theme-orange', 'dark-theme-orange', 'theme-purple', 'dark-theme-purple', 'theme-luxury', 'dark-theme-luxury']}
         >
           <AuthProvider>
             {children}
             <Toaster />
-            {/* <ContactFab /> */}
           </AuthProvider>
         </ThemeProvider>
       </body>

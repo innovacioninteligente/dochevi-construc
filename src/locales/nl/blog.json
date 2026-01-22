@@ -1,0 +1,15 @@
+
+{
+    "title": "Our Blog",
+    "subtitle": "Tips, trends, and inspiration for your construction and renovation projects.",
+    "readMore": "Read more",
+    "cta": {
+        "title": "Ready to Start Your Project?",
+        "subtitle": "Contact us today for a free, no-obligation consultation. Our team is ready to help you bring your vision to life.",
+        "button": "Instant Quote",
+        "postCta": {
+            "title": "Transform Your Home with Our Help",
+            "subtitle": "Inspired by this article? Turn your ideas into reality. Get a quick, no-obligation estimate for your next project."
+        }
+    }
+}

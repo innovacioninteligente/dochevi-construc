@@ -1,0 +1,129 @@
+{
+    "hero": {
+        "title": "Wij transformeren ruimtes <br/> <span class='text-primary italic'>in ervaringen</span>",
+        "subtitle": "Hoogwaardige totaalrenovaties op Mallorca. Waar kwaliteit en exclusiviteit samenkomen.",
+        "cta": "Vraag premium offerte aan",
+        "ctaSecondary": "Bekijk diensten"
+    },
+    "vision": {
+        "label": "Onze Filosofie",
+        "title": "Het nieuwe tijdperk van <br/> <span class='text-primary'>moderne bouw</span>",
+        "description": "Bij Express Renovation Mallorca herdefiniëren we de standaard voor luxe renovaties. We laten traditionele onzekerheid achter ons en omarmen technologische precisie en ambachtelijke excellentie.",
+        "points": [
+            "Gecertificeerde Europese kwaliteitsnormen.",
+            "3D-visualisatietechnologie vóór de start.",
+            "Vaste termijnen onder contract.",
+            "Premium afwerkingen en duurzame materialen."
+        ],
+        "cta": "Ontdek ons verhaal"
+    },
+    "servicesGrid": {
+        "label": "Onze Specialiteiten",
+        "title": "Excellentie in elk detail",
+        "subtitle": "We beheersen de sleuteldisciplines om uitzonderlijke woningen te creëren.",
+        "items": [
+            {
+                "title": "Totaalrenovaties",
+                "description": "Volledige transformatie van residentiële en commerciële ruimtes. Totale coördinatie van vakmensen.",
+                "link": "/servicios/reformas-integrales"
+            },
+            {
+                "title": "Designkeukens",
+                "description": "Het hart van het huis, ontworpen om te inspireren. Ergonomie, edele materialen en technologie.",
+                "link": "/servicios/cocinas"
+            },
+            {
+                "title": "Badkamers & Wellness",
+                "description": "Privé-ontspanningsoases. Regendouches, vrijstaande baden en spa-afwerking.",
+                "link": "/servicios/banos"
+            },
+            {
+                "title": "Buitenruimtes & Tuinaanleg",
+                "description": "Terrassen, zwembaden en tuinen die uw leefruimte uitbreiden naar de natuur van Mallorca.",
+                "link": "/servicios/exteriores"
+            },
+            {
+                "title": "Restauratie van Gevels",
+                "description": "We herstellen de oorspronkelijke pracht van historische en moderne gebouwen. Technieken met respect voor erfgoed.",
+                "link": "/servicios/fachadas"
+            },
+            {
+                "title": "SATE Isolatie",
+                "description": "Superieure energie-efficiëntie. Thermische gevelbekleding die verbruik vermindert en comfort verbetert.",
+                "link": "/servicios/aislamiento"
+            }
+        ],
+        "cta": "Bekijk details"
+    },
+    "transformations": {
+        "label": "Voor & Na",
+        "title": "Echte Transformaties",
+        "subtitle": "Onze resultaten spreken meer dan woorden. Veeg om de verandering te zien.",
+        "sidebarTitle": "Klaar voor uw transformatie?",
+        "sidebarDescription": "Elk project begint met een visie. Wij helpen u deze te definiëren en uit te voeren zonder afwijkingen.",
+        "sidebarStep1Title": "Structurele Analyse",
+        "sidebarStep1Desc": "We evalueren de technische haalbaarheid.",
+        "sidebarStep2Title": "Designvoorstel",
+        "sidebarStep2Desc": "Fotorealistische renders van uw toekomstige huis.",
+        "cta": "Bekijk volledige galerij"
+    },
+    "processSteps": {
+        "label": "Totale Transparantie",
+        "title": "De Express Methode: Geen Verrassingen",
+        "subtitle": "Een lineair en voorspelbaar proces ontworpen voor uw gemoedsrust.",
+        "steps": [
+            {
+                "title": "Eerste Consultatie",
+                "description": "Ontmoeting ter plaatse om uw behoeften en budget te begrijpen."
+            },
+            {
+                "title": "Design & Planning",
+                "description": "Creatie van plannen, 3D-renders en gedetailleerde begroting."
+            },
+            {
+                "title": "Expertuitvoering",
+                "description": "Bouw onder constant toezicht en vaste termijnen."
+            },
+            {
+                "title": "Sleutelklare Oplevering",
+                "description": "Eindschoonmaak, kwaliteitscontrole en sleuteloverdracht."
+            }
+        ]
+    },
+    "locations": {
+        "label": "Exclusieve Dekking",
+        "title": "Renovaties op de beste locaties van Mallorca",
+        "subtitle": "Onze logistiek en ons team zijn voorbereid om te werken in de meest veeleisende gebieden van het eiland, met garantie van discretie en naleving van lokale regelgeving.",
+        "link": "Bekijk alle werkgebieden"
+    },
+    "faq": {
+        "label": "Vragen Opgelost",
+        "title": "Expertise die rust geeft",
+        "subtitle": "We weten dat een renovatie vragen oproept. Hier beantwoorden we de meest voorkomende met de eerlijkheid die ons kenmerkt.",
+        "items": [
+            {
+                "question": "Hoe lang duurt een totaalrenovatie op Mallorca?",
+                "answer": "De tijd varieert afhankelijk van de complexiteit, maar een standaard totaalrenovatie duurt meestal tussen 3 en 5 maanden. Bij Express Renovation Mallorca garanderen we contractueel vastgelegde termijnen dankzij onze planning met 3D-technologie, waardoor gebruikelijke vertragingen in de sector worden voorkomen."
+            },
+            {
+                "question": "Regelen jullie de bouwvergunningen?",
+                "answer": "Ja, we regelen het hele bureaucratische proces. Van het aanvragen van gemeentelijke vergunningen (grote of kleine werken) tot het beheer van openbare wegbezetting. Ons technisch team kent de regelgeving van elk gemeentehuis in detail."
+            },
+            {
+                "question": "Kan ik het ontwerp zien voordat er wordt gestart?",
+                "answer": "Absoluut. Het is een fundamenteel onderdeel van onze Express Methode. We ontwikkelen fotorealistische renders en gedetailleerde plannen voordat de eerste steen wordt gelegd, om ervoor te zorgen dat het eindresultaat precies overeenkomt met uw visie."
+            },
+            {
+                "question": "Werken jullie met een vast budget?",
+                "answer": "Ja. Ons transparantiebeleid elimineert verrassingen. Zodra het ontwerp en de materialen zijn goedgekeurd, is de prijs vast, tenzij u besluit wijzigingen aan te brengen tijdens de werkzaamheden."
+            }
+        ]
+    },
+    "cta": {
+        "title": "Uw Project, Onze Prioriteit",
+        "subtitle": "Laat uw investering niet aan het toeval over. Plan een gratis consultatie en ontdek het ware potentieel van uw vastgoed.",
+        "buttonPrimary": "Vraag nu offerte aan",
+        "buttonSecondary": "Spreek met een adviseur",
+        "note": "Beperkte plaatsen per maand om kwaliteit te waarborgen"
+    }
+}

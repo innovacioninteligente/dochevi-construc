@@ -1,0 +1,32 @@
+{
+    "title": "Pricing Settings for Quick Quotes",
+    "description": "Adjust the base prices per square meter (€/m²) used for automatic estimations.",
+    "integral": {
+        "title": "Full Renovation"
+    },
+    "bathrooms": {
+        "title": "Bathroom Renovation"
+    },
+    "kitchen": {
+        "title": "Kitchen Renovation"
+    },
+    "levels": {
+        "basic": "Basic Quality",
+        "medium": "Medium Quality",
+        "premium": "Premium Quality"
+    },
+    "buttons": {
+        "save": "Save Changes",
+        "loading": "Saving..."
+    },
+    "toast": {
+        "success": {
+            "title": "Prices Updated",
+            "description": "The new pricing configuration has been saved successfully."
+        },
+        "error": {
+            "title": "Error Saving",
+            "description": "Could not save the pricing configuration. Please try again."
+        }
+    }
+}

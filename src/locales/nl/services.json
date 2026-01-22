@@ -1,0 +1,118 @@
+
+{
+  "construccion-y-reformas": {
+    "title": "Construction and Renovations",
+    "subtitle": "We transform your spaces, from scratch or renovating the existing.",
+    "shortDescription": "New construction, renovations, and extensions for all types of buildings.",
+    "description": "We specialize in executing new constructions, comprehensive renovations, and extensions. Our team of professionals manages each project with the utmost dedication to ensure results that exceed your expectations, paying attention to every detail from the foundation to the final finishes.",
+    "features": [
+      "Comprehensive management of new construction projects.",
+      "Complete renovations of homes and commercial premises.",
+      "Extensions and redistribution of spaces.",
+      "Advice on materials and construction solutions."
+    ]
+  },
+  "piscinas": {
+    "title": "Pool Construction",
+    "subtitle": "The oasis you've always dreamed of, in your own home.",
+    "shortDescription": "Design, construction, and maintenance of swimming pools for you to enjoy the summer.",
+    "description": "We design and build custom-made swimming pools, adapted to your land and your dreams. We use the most advanced techniques and top-quality materials to create unique leisure and relaxation spaces for you and your family.",
+    "features": [
+      "Custom pool design.",
+      "Construction with shotcrete (gunite).",
+      "Installation of saline chlorination and heating systems.",
+      "Maintenance and repair service."
+    ]
+  },
+  "reformas-de-interiores": {
+    "title": "Interior Renovations",
+    "subtitle": "Renew the heart of your home: functional and designer bathrooms and kitchens.",
+    "shortDescription": "Specialists in bathroom and kitchen renovations, optimizing space and style.",
+    "description": "We are experts in renovating bathrooms and kitchens, two of the most important rooms in the home. We optimize the distribution to gain functionality and create modern and cozy environments using state-of-the-art materials.",
+    "features": [
+      "Complete renewal of tiling and flooring.",
+      "Installation of new plumbing and electricity.",
+      "Custom assembly of kitchen and bathroom furniture.",
+      "Installation of shower trays, screens, and sanitary ware."
+    ]
+  },
+  "paramentos-verticales": {
+    "title": "Vertical Walls",
+    "subtitle": "We protect and beautify your facades and walls.",
+    "shortDescription": "Solutions for facades and walls, from cladding to insulation.",
+    "description": "We offer a wide range of solutions for vertical walls, including the application of single-layer mortars, renders, and external thermal insulation systems (ETICS), improving the energy efficiency and aesthetics of your building.",
+    "features": [
+      "Application of continuous coatings.",
+      "External Thermal Insulation Composite Systems (ETICS).",
+      "Repair and rehabilitation of facades.",
+      "Exterior painting and waterproofing."
+    ]
+  },
+  "electricidad": {
+    "title": "Electricity",
+    "subtitle": "Safe and efficient electrical installations for your peace of mind.",
+    "shortDescription": "Wiring, lighting, panel upgrades, and safety inspections.",
+    "description": "We carry out all types of electrical installations, from the complete wiring of a home to the installation of new light points, always complying with current regulations to ensure maximum safety and energy efficiency.",
+    "features": [
+      "Complete electrical installations in new construction.",
+      "Updating and reforming old installations.",
+      "Electrical bulletins and certifications.",
+      "Installation of low-consumption LED lighting."
+    ]
+  },
+  "carpinteria": {
+    "title": "Wood and Aluminum Carpentry",
+    "subtitle": "Artisanal precision and modern durability in your finishes.",
+    "shortDescription": "Expert services in wood and aluminum carpentry for a perfect and long-lasting finish.",
+    "description": "We combine the warmth of traditional wood carpentry with the modernity and resilience of aluminum carpentry. We offer custom solutions for doors, windows, enclosures, pergolas, and furniture, adapting to the aesthetics and functionality of your project. Whether you're looking for a classic touch or a contemporary design, our team masterfully works with both materials.",
+    "features": [
+      "Manufacturing and installation of aluminum and PVC windows and doors with thermal break.",
+      "Design and assembly of aluminum enclosures, pergolas, and structures.",
+      "Installation of wooden passage and entrance doors.",
+      "Design and manufacturing of custom wooden wardrobes, dressing rooms, and furniture."
+    ]
+  },
+  "fontaneria": {
+    "title": "Specialized Plumbing",
+    "subtitle": "Durable solutions for the water system of your home or business.",
+    "shortDescription": "Complete plumbing services, from installations to repairs.",
+    "description": "Our qualified plumbers take care of the installation and repair of the entire sanitation and drinking water network. We guarantee fast, clean, and durable work, using the best quality materials.",
+    "features": [
+      "Complete installation of plumbing and drainage networks.",
+      "Repair of leaks and breakdowns.",
+      "Installation of faucets and sanitary ware.",
+      "Domestic hot water systems (boilers, heaters)."
+    ]
+  },
+  "pintura": {
+    "title": "Professional Painting",
+    "subtitle": "We bring color and new life to your walls, inside and out.",
+    "shortDescription": "Interior and exterior painting services for homes, communities, and commercial spaces.",
+    "description": "Our team of professional painters transforms any space with a flawless finish. We use high-quality paints to ensure durability and a superior aesthetic result, whether it's for renovating a room or protecting your building's facade.",
+    "features": [
+      "Plastic, enamel, and decorative paints for interiors.",
+      "Special coatings and paints for exterior facades.",
+      "Wall smoothing and stipple removal.",
+      "Moisture treatment and surface preparation."
+    ]
+  },
+  "impermeabilizacion": {
+    "title": "Waterproofing and Roofing",
+    "subtitle": "Total protection against leaks and humidity.",
+    "shortDescription": "Expert solutions for roofs, and terraces, ensuring complete watertightness.",
+    "description": "Proper waterproofing is key to the health of any building. We offer comprehensive solutions for flat roofs, terraces, pitched roofs, and walls, using the most advanced systems to prevent and definitively solve problems of leaks and humidity.",
+    "features": [
+      "Waterproofing of flat roofs and walkable terraces.",
+      "Repair and maintenance of roofs.",
+      "Application of asphalt sheets, PVC, EPDM, and liquid membranes.",
+      "Thermal insulation for roofs, improving energy efficiency."
+    ]
+  },
+  "cta": {
+    "title": "Ready to start your {serviceName} project?",
+    "subtitle": "Get a cost estimate for your project right now. It's fast and non-binding.",
+    "button": "Instant Quote",
+    "descriptionTitle": "Service Description",
+    "featuresTitle": "Key Features"
+  }
+}

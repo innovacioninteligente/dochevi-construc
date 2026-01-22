@@ -1,0 +1,24 @@
+{
+    "title": "Contact",
+    "subtitle": "Have a question or want to start a project? We're here to help. Fill out the form or use our contact details.",
+    "formTitle": "Send us a Message",
+    "infoTitle": "Our Information",
+    "form": {
+        "name": "Name",
+        "namePlaceholder": "Your full name",
+        "email": "Email",
+        "emailPlaceholder": "you@email.com",
+        "message": "Message",
+        "messagePlaceholder": "Tell us about your project or inquiry...",
+        "button": "Send Message"
+    },
+    "address": {
+        "label": "Our Office"
+    },
+    "phone": {
+        "label": "Phone"
+    },
+    "email": {
+        "label": "Email"
+    }
+}

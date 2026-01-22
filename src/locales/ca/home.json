@@ -1,109 +1,129 @@
-
 {
     "hero": {
-        "title": "Solucions expertes de construcció i reformes",
-        "subtitle": "Oferim una àmplia gamma de serveis de construcció i oficis per a llars, negocis i projectes industrials. Qualitat i confiança a cada maó.",
-        "cta": "Pressupost al instant",
-        "ctaSecondary": "Els Nostres Serveis"
+        "title": "Transformem Espais <br/> <span class='text-primary italic'>en Experiències</span>",
+        "subtitle": "Reformes integrals d'alta gamma a Mallorca. On la qualitat es troba amb l'exclusivitat.",
+        "cta": "Sol·licitar Pressupost Premium",
+        "ctaSecondary": "Descobrir Serveis"
     },
-    "services": {
-        "title": "Els Nostres Serveis Especialitzats",
-        "subtitle": "Des d'obra nova fins al manteniment de la seva piscina, el nostre equip d'experts està a punt per fer realitat el seu projecte.",
-        "detailsButton": "Veure més detalls"
+    "vision": {
+        "label": "La Nostra Filosofia",
+        "title": "La Nova Era de la <br/> <span class='text-primary'>Construcció Moderna</span>",
+        "description": "A Express Renovation Mallorca, redefinim l'estàndard de les reformes de luxe. Deixem enrere la incertesa tradicional per abraçar la precisió tecnològica i l'excel·lència artesanal.",
+        "points": [
+            "Estàndards de qualitat europeus certificats.",
+            "Tecnologia de visualització 3D abans de començar.",
+            "Terminis tancats sota contracte.",
+            "Acabats premium i materials sostenibles."
+        ],
+        "cta": "Coneix la nostra història"
     },
-    "about": {
-        "title": "Sobre Nosaltres",
-        "description1": "Som una empresa especialitzada en reformes i construcció. Estem des del 2003 al sector, per la qual cosa et garantim que rebràs de la nostra part la màxima seriositat, responsabilitat, compromís i professionalitat, brindant-te els millors resultats en els treballs que realitzem.",
-        "description2": "La nostra reputació es basa en la satisfacció del client, per la qual cosa ens esforcem per superar les expectatives a cada projecte que emprenem. La nostra empresa és l'elecció ideal per a aquells que busquen qualitat, professionalisme i compromís.",
-        "reason1": "Professionals Experimentats",
-        "reason2": "Qualitat i Atenció al Detall",
-        "reason3": "Transparència i Compromís"
+    "servicesGrid": {
+        "label": "Les Nostres Especialitats",
+        "title": "Excel·lència en Cada Detall",
+        "subtitle": "Dominem les disciplines clau per crear llars excepcionals.",
+        "items": [
+            {
+                "title": "Reformes Integrals",
+                "description": "Transformació completa d'espais residencials i comercials. Coordinació total de gremis.",
+                "link": "/servicios/reformas-integrales"
+            },
+            {
+                "title": "Cuines de Disseny",
+                "description": "El cor de la llar, dissenyat per inspirar. Ergonomia, materials nobles i tecnologia.",
+                "link": "/servicios/cocinas"
+            },
+            {
+                "title": "Banys & Wellness",
+                "description": "Oasis de relaxació privats. Dutxes de pluja, banyeres exemptes i acabats spa.",
+                "link": "/servicios/banos"
+            },
+            {
+                "title": "Exteriors & Paisatgisme",
+                "description": "Terrasses, piscines i jardins que estenen el teu espai vital cap a la natura mallorquina.",
+                "link": "/servicios/exteriores"
+            },
+            {
+                "title": "Restauració de Façanes",
+                "description": "Recuperem l'esplendor original d'edificis històrics i moderns. Tècniques respectuoses amb el patrimoni.",
+                "link": "/servicios/fachadas"
+            },
+            {
+                "title": "Aïllament SATE",
+                "description": "Eficiència energètica superior. Revestiment tèrmic exterior que redueix el consum i millora el confort.",
+                "link": "/servicios/aislamiento"
+            }
+        ],
+        "cta": "Veure detalls"
     },
-    "process": {
-        "title": "El Nostre Procés de Treball",
-        "subtitle": "Et guiem a cada pas del camí, des de la idea inicial fins a l'entrega final del teu projecte.",
-        "step1": {
-            "title": "Consulta Inicial",
-            "description": "Tot comença amb una conversa per entendre les teves necessitats, idees i pressupost."
-        },
-        "step2": {
-            "title": "Disseny i Pressupost",
-            "description": "Creem un pla detallat i un pressupost transparent adaptat a les teves especificacions."
-        },
-        "step3": {
-            "title": "Execució i Supervisió",
-            "description": "El nostre equip d'experts executa el projecte amb la màxima qualitat i supervisió constant."
-        },
-        "step4": {
-            "title": "Entrega i Garantia",
-            "description": "Lliurem el projecte acabat, assegurant la teva total satisfacció i oferint garantia per la nostra feina."
-        },
-        "cta": {
-            "title": "Veus que fàcil? Comença ara.",
-            "subtitle": "Fes el primer pas per fer realitat el teu projecte."
-        }
+    "transformations": {
+        "label": "Abans i Després",
+        "title": "Transformacions Reals",
+        "subtitle": "Més enllà de les paraules, els nostres resultats parlen. Llisca per veure el canvi.",
+        "sidebarTitle": "A punt per a la teva transformació?",
+        "sidebarDescription": "Cada projecte comença amb una visió. Nosaltres t'ajudem a definir-la i executar-la sense desviacions.",
+        "sidebarStep1Title": "Anàlisi Estructural",
+        "sidebarStep1Desc": "Avaluem la viabilitat tècnica.",
+        "sidebarStep2Title": "Proposta de Disseny",
+        "sidebarStep2Desc": "Renders fotorrealistes de la teva futura llar.",
+        "cta": "Veure Galeria Completa"
     },
-    "projects": {
-        "title": "Projectes Destacats",
-        "subtitle": "Una mostra de la nostra feina. Projectes reals per a clients satisfets.",
-        "project1": {
-            "title": "Reforma Integral de Cuina",
-            "category": "Disseny d'Interiors"
-        },
-        "project2": {
-            "title": "Piscina de Disseny",
-            "category": "Construcció de Piscines"
-        },
-        "project3": {
-            "title": "Rehabilitació de Façana",
-            "category": "Paraments Verticals"
-        },
-        "project4": {
-            "title": "Reforma de Bany Modern",
-            "category": "Reformes d'Interiors"
-        },
-        "project5": {
-            "title": "Renovació de Cuina Elegant",
-            "category": "Disseny de Cuines"
-        },
-        "project6": {
-            "title": "Idea per a Bany",
-            "category": "Reformes de Banys"
-        },
-        "project7": {
-            "title": "Inspiració per a Bany",
-            "category": "Disseny d'Interiors"
-        },
-        "project8": {
-            "title": "Renovació de Terrassa",
-            "category": "Disseny d'Exteriors"
-        },
-        "project9": {
-            "title": "Transformació de Jardí",
-            "category": "Jardineria"
-        },
-        "project10": {
-            "title": "Façana Vibrant",
-            "category": "Disseny Exterior"
-        },
-        "cta": {
-            "title": "Comença el teu projecte",
-            "subtitle": "Tens una idea? Fem-la realitat.",
-            "button": "Pressupost al instant"
-        }
+    "processSteps": {
+        "label": "Transparència Total",
+        "title": "El Mètode Express: Sense Sorpreses",
+        "subtitle": "Un procés lineal i predictible dissenyat per a la teva tranquil·litat.",
+        "steps": [
+            {
+                "title": "Consulta Inicial",
+                "description": "Reunió in-situ per entendre les teves necessitats i pressupost."
+            },
+            {
+                "title": "Disseny & Planificació",
+                "description": "Creació de plànols, renders 3D i pressupost detallat."
+            },
+            {
+                "title": "Execució Experta",
+                "description": "Construcció sota supervisió constant i terminis fixos."
+            },
+            {
+                "title": "Lliurament Claus en Mà",
+                "description": "Neteja final, revisió de qualitat i lliurament de claus."
+            }
+        ]
     },
-    "testimonials": {
-        "title": "L'opinió dels nostres clients",
-        "subtitle": "Ens enorgulleix la feina que fem i la satisfacció dels qui confien en nosaltres.",
-        "testimonial2": "Vam contractar l'empresa per al nostre projecte de reforma integral i l'experiència va ser de 5 estrelles en tots els sentits. La qualitat de la construcció és impecable, però el que més destaco és la seva eficiència i el respecte pels terminis. Són veritables experts en edificació. Si busques una constructora de confiança que sàpiga el que fa, aquesta és l'opció.",
-        "customer2": "Gerson Agredo",
-        "testimonial3": "Vam contractar l'empresa per al nostre projecte de reforma integral i l'experiència va ser de 5 estrelles en tots els sentits. La qualitat de la construcció és impecable, però el que més destaco és la seva eficiència i el respecte pels terminis. Són veritables experts en edificació. Si busques una constructora de confiança que sàpiga el que fa, aquesta és l'opció.",
-        "customer3": "Alex Castells",
-        "project": "Reforma Integral"
+    "locations": {
+        "label": "Cobertura Exclusiva",
+        "title": "Reformes a les Millors Ubicacions de Mallorca",
+        "subtitle": "La nostra logística i equip estan preparats per operar a les zones més exigents de l'illa, garantint discreció i compliment de normatives locals.",
+        "link": "Veure totes les zones d'actuació"
     },
-    "finalCta": {
-        "title": "A punt per començar el teu projecte?",
-        "subtitle": "Contacta amb nosaltres avui mateix per a una consulta gratuïta i sense compromís. El nostre equip està a punt per ajudar-te a fer realitat la teva visió.",
-        "reviewLink": "Valora el nostre servei, ens ayuda a créixer!"
+    "faq": {
+        "label": "Dubtes Resolts",
+        "title": "Expertise que Genera Tranquil·litat",
+        "subtitle": "Sabem que una reforma genera preguntes. Aquí responem a les més habituals amb l'honestedat que ens caracteritza.",
+        "items": [
+            {
+                "question": "Quant triga una reforma integral a Mallorca?",
+                "answer": "El temps varia segons la complexitat, però una reforma integral estàndard sol oscil·lar entre 3 i 5 mesos. A Express Renovation Mallorca, garantim terminis tancats per contracte gràcies a la nostra planificació prèvia amb tecnologia 3D, evitant els retards habituals del sector."
+            },
+            {
+                "question": "Gestioneu les llicències d'obra?",
+                "answer": "Sí, ens encarreguem de tot el procés burocràtic. Des de la sol·licitud de llicències municipals (obra major o menor) fins a la gestió d'ocupació de via pública. El nostre equip tècnic coneix al detall les normatives de cada ajuntament."
+            },
+            {
+                "question": "Puc veure el disseny abans de començar l'obra?",
+                "answer": "Absolutament. És part fonamental del nostre Mètode Express. Desenvolupem renders fotorrealistes i plànols detallats abans de posar el primer maó, assegurant que el resultat final coincideixi exactament amb la teva visió."
+            },
+            {
+                "question": "Treballeu amb pressupost tancat?",
+                "answer": "Sí. La nostra política de transparència elimina les sorpreses. Una vegada aprovat el disseny i els materials, el preu és fix, llevat que tu decideixis fer canvis durant l'obra."
+            }
+        ]
+    },
+    "cta": {
+        "title": "El Teu Projecte, La Nostra Prioritat",
+        "subtitle": "No deixis la teva inversió en mans de l'atzar. Agenda una consulta gratuïta i descobreix el potencial real de la teva propietat.",
+        "buttonPrimary": "Sol·licitar Pressupost Ara",
+        "buttonSecondary": "Parlar amb un Agent",
+        "note": "Places limitades per mes per garantir qualitat"
     }
 }

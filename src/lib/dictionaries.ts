@@ -1,4 +1,4 @@
-type Locale = 'es' | 'en' | 'de' | 'ca';
+type Locale = 'es' | 'en' | 'de' | 'ca' | 'nl';
 
 const dictionaries: Record<Locale, () => Promise<any>> = {
   en: async () => {
@@ -53,9 +53,22 @@ const dictionaries: Record<Locale, () => Promise<any>> = {
     const contact = await import('@/locales/ca/contact.json').then((module) => module.default);
     return { header, home, budgetRequest, login, signup, dashboard, services, pricingSettings, blog, contact };
   },
-}
+  nl: async () => {
+    const header = await import('@/locales/nl/header.json').then((module) => module.default);
+    const home = await import('@/locales/nl/home.json').then((module) => module.default);
+    const budgetRequest = await import('@/locales/nl/budget-request.json').then((module) => module.default);
+    const login = await import('@/locales/nl/login.json').then((module) => module.default);
+    const signup = await import('@/locales/nl/signup.json').then((module) => module.default);
+    const dashboard = await import('@/locales/nl/dashboard.json').then((module) => module.default);
+    const services = await import('@/locales/nl/services.json').then((module) => module.default);
+    const pricingSettings = await import('@/locales/nl/pricing-settings.json').then((module) => module.default);
+    const blog = await import('@/locales/nl/blog.json').then((module) => module.default);
+    const contact = await import('@/locales/nl/contact.json').then((module) => module.default);
+    return { header, home, budgetRequest, login, signup, dashboard, services, pricingSettings, blog, contact };
+  },
+};
 
 export const getDictionary = async (locale: Locale) => {
-    const loader = dictionaries[locale] || dictionaries.es;
-    return loader();
+  const loader = dictionaries[locale] || dictionaries.es;
+  return loader();
 };

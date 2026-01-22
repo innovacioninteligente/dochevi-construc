@@ -1,0 +1,10 @@
+{
+    "title": "Create an account",
+    "description": "Join to request budgets and manage your projects.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "button": "Create Account",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Log in"
+}

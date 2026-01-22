@@ -38,12 +38,18 @@ export function DashboardLayout({ children, t }: { children: React.ReactNode, t:
     { href: '/dashboard/budget-request', label: t.dashboard.nav.requestBudget, icon: <PlusCircle /> },
     { href: '/dashboard/my-budgets', label: t.dashboard.nav.myBudgets, icon: <FileText /> },
     { href: '/dashboard/seo-generator', label: t.dashboard.nav.seoGenerator, icon: <Lightbulb /> },
+
+
   ];
 
   const settingsNavItems = [
     { href: '/dashboard/settings/pricing', label: t.dashboard.nav.pricing, icon: <DollarSign /> },
+    { href: '/dashboard/admin/prices', label: 'Admin Precios', icon: <FileText /> },
     { href: '/dashboard/settings', label: t.dashboard.nav.settings, icon: <Settings /> },
-  ]
+  ];
+
+
+
 
   React.useEffect(() => {
     if (!loading && !user) {
@@ -85,7 +91,7 @@ export function DashboardLayout({ children, t }: { children: React.ReactNode, t:
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-           <SidebarMenu className="mt-auto">
+          <SidebarMenu className="mt-auto">
             {settingsNavItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
@@ -105,17 +111,17 @@ export function DashboardLayout({ children, t }: { children: React.ReactNode, t:
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter className="items-center">
-            <LanguageSwitcher />
+          <LanguageSwitcher />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-40 w-full border-b bg-background">
           <div className="container flex h-16 items-center justify-end">
-             <UserNav t={t.header.userNav} />
+            <UserNav t={t.header.userNav} />
           </div>
         </header>
         <main className="flex-1 p-4 md:p-8">
-            {children}
+          {children}
         </main>
       </SidebarInset>
     </SidebarProvider>

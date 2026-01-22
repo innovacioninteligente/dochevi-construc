@@ -1,0 +1,301 @@
+
+{
+    "title": "Request Your Quote",
+    "description": "Choose the level of detail you want to provide, and we'll give you an estimate.",
+    "page": {
+        "title": "Instant Quote",
+        "description": "Fill out our quick form and get a cost estimate for your project in just a few minutes."
+    },
+    "selection": {
+        "quick": {
+            "title": "Quick Budget",
+            "description": "Ideal for getting a quick estimate of your project's cost with minimal data."
+        },
+        "detailed": {
+            "title": "Detailed Budget",
+            "description": "Provide all the details to get a more accurate and tailored preliminary budget."
+        }
+    },
+    "quickForm": {
+        "title": "Quick Budget Form",
+        "description": "Fill in the following fields to get a rough estimate.",
+        "renovationType": {
+            "label": "Type of Renovation",
+            "options": {
+                "integral": "Full Renovation",
+                "bathrooms": "Bathroom Renovation",
+                "kitchen": "Kitchen Renovation",
+                "pool": "Pool Construction"
+            }
+        },
+        "squareMeters": {
+            "label": "Floor square meters (m²)"
+        }
+    },
+    "detailedForm": {
+        "title": "Detailed Budget",
+        "description": "Provide all the details to get a more accurate preliminary budget."
+    },
+    "steps": {
+        "contact": "Contact Information",
+        "projectDefinition": "Project Definition",
+        "demolition": "Demolition and Preliminary Work",
+        "bathroom": "Bathroom Renovation(s)",
+        "kitchen": "Kitchen Renovation",
+        "workArea": "Workspace Setup",
+        "ceilings": "False Ceilings and Insulation",
+        "electricity": "Electrical Installation",
+        "carpentry": "Carpentry and Painting",
+        "optionals": "Optionals",
+        "summary": "Summary and Submission"
+    },
+    "summary": {
+        "title": "Summary of Your Request",
+        "description": "Please review all the details to ensure they are correct before submitting your request. A specialist will contact you to refine the details."
+    },
+    "confirmation": {
+        "title": "Request Received!",
+        "description": "Thank you for completing your request. Our team will review it and contact you within the next 24-48 hours.",
+        "button": "Back to Homepage",
+        "noCostMessage": "This is an indicative and non-contractual price. A specialist will contact you to provide a detailed budget.",
+        "poolMessage": "One of our pool experts will be in touch shortly to detail your project.",
+        "restartForm": "Start Over",
+        "reviewButton": "See our customer reviews"
+    },
+    "form": {
+        "buttons": {
+            "prev": "Previous",
+            "next": "Next",
+            "submit": "Calculate Estimated Price",
+            "loading": "Submitting..."
+        },
+        "name": {
+            "label": "Full Name",
+            "placeholder": "Your first and last name"
+        },
+        "email": {
+            "label": "Email Address",
+            "placeholder": "you@email.com"
+        },
+        "phone": {
+            "label": "Contact Phone",
+            "placeholder": "+1 123 456 7890"
+        },
+        "address": {
+            "label": "Project Address",
+            "placeholder": "Street, number, city"
+        },
+        "projectDefinition": {
+            "propertyType": {
+                "label": "Property Type",
+                "residential": "Residential (Flat/House)",
+                "commercial": "Commercial Space",
+                "office": "Office"
+            },
+            "projectScope": {
+                "label": "Project Scope",
+                "integral": "Full Renovation",
+                "partial": "Partial Renovation"
+            },
+            "partialScope": {
+                "label": "Areas to renovate",
+                "description": "Select the areas you want to include in the partial renovation."
+            },
+            "totalAreaM2": {
+                "label": "Total Property Area (m²)"
+            },
+            "numberOfRooms": {
+                "label": "Number of Rooms"
+            },
+            "numberOfBathrooms": {
+                "label": "Number of Bathrooms"
+            }
+        },
+        "workArea": {
+            "workstations": {
+                "label": "Number of Workstations/Desks"
+            },
+            "meetingRooms": {
+                "label": "Number of Meeting Rooms"
+            }
+        },
+        "quality": {
+            "label": "Desired Quality Level",
+            "placeholder": "Select a quality level",
+            "options": {
+                "basic": "Basic",
+                "medium": "Medium",
+                "premium": "Premium"
+            }
+        },
+        "demolition": {
+            "demolishPartitions": {
+                "label": "Do you need demolition of interior partitions?"
+            },
+            "demolishPartitionsM2": {
+                "label": "Square meters (m²) of partition to demolish"
+            },
+            "removeDoors": {
+                "label": "Do you need to remove existing interior doors?"
+            },
+            "removeDoorsAmount": {
+                "label": "Quantity (pcs) of doors to remove"
+            }
+        },
+        "bathroom": {
+            "bathroomWallTilesM2": {
+                "label": "Do you want to change the wall tiles? (Indicate m²)"
+            },
+            "bathroomFloorM2": {
+                "label": "Do you want to change the floor? (Indicate m²)"
+            },
+            "installShowerTray": {
+                "label": "Do you need a shower tray installation?"
+            },
+            "installShowerScreen": {
+                "label": "Do you need a shower screen installation?"
+            },
+            "bathroomPlumbing": {
+                "label": "Do you want a complete renovation of the bathroom plumbing?"
+            }
+        },
+        "kitchen": {
+            "renovateKitchen": {
+                "label": "Do you want to renovate the kitchen?"
+            },
+            "kitchenDemolition": {
+                "label": "Do you need demolition of furniture or built-in kitchen?"
+            },
+            "kitchenWallTilesM2": {
+                "label": "Do you want to change the wall tiles? (Indicate m²)"
+            },
+            "kitchenFloorM2": {
+                "label": "Do you want to change the floor? (Indicate m²)"
+            },
+            "kitchenPlumbing": {
+                "label": "Do you want a complete renovation of the kitchen plumbing?"
+            }
+        },
+        "ceilings": {
+            "installFalseCeiling": {
+                "label": "Do you want to install a false ceiling in the bathroom/kitchen?"
+            },
+            "falseCeilingM2": {
+                "label": "Square meters (m²) of false ceiling"
+            },
+            "soundproofRoom": {
+                "label": "Do you need room soundproofing (with rock wool and double plasterboard)?"
+            },
+            "soundproofRoomM2": {
+                "label": "Square meters (m²) to soundproof"
+            }
+        },
+        "electricity": {
+            "renovateElectricalPanel": {
+                "label": "Do you want to renew the main electrical panel and the current installation?"
+            },
+            "perRoom": {
+                "kitchen": "Kitchen",
+                "livingRoom": "Living Room",
+                "bedroom": "Bedroom",
+                "sockets": "Socket points to add",
+                "lights": "Switched light points to add",
+                "tv": "Do you want a TV outlet?"
+            }
+        },
+        "carpentry": {
+            "renovateInteriorDoors": {
+                "label": "Do you want to renovate the interior passage doors?"
+            },
+            "interiorDoorsAmount": {
+                "label": "Quantity (pcs) of passage doors"
+            },
+            "installSlidingDoor": {
+                "label": "Do you need a sliding door?"
+            },
+            "slidingDoorAmount": {
+                "label": "Quantity (pcs) of sliding doors"
+            },
+            "paintWalls": {
+                "label": "Do you want to paint walls and ceilings white?"
+            },
+            "paintWallsM2": {
+                "label": "Square meters (m²) of surface to paint"
+            },
+            "removeGotele": {
+                "label": "Do you need to smooth walls (remove stipple)?"
+            },
+            "removeGoteleM2": {
+                "label": "Square meters (m²) to smooth"
+            }
+        },
+        "optionals": {
+            "installAirConditioning": {
+                "label": "Do you want ducted air conditioning installation?",
+                "description": "Estimate for the entire home."
+            },
+            "renovateExteriorCarpentry": {
+                "label": "Do you want to renovate the PVC exterior carpentry with thermal break?",
+                "description": "Estimate for the entire home."
+            }
+        },
+        "toast": {
+            "success": {
+                "title": "Request Sent!",
+                "description": "We have received your request. Our team will contact you shortly."
+            },
+            "error": {
+                "title": "Error Sending Request",
+                "description": "Could not process your request. Please try again later."
+            }
+        }
+    },
+    "reformInclusions": {
+        "title": "What a renovation of",
+        "kitchen": [
+            "Dismantling of kitchen furniture",
+            "Demolition, tiling, electricity, plumbing, flooring.",
+            "Preliminary preparations: chasing, electricity and plumbing, wall rendering.",
+            "Complete plumbing: replacement of hot and cold water installation and drains.",
+            "Wall tiling",
+            "Floor laying",
+            "New electricity: sockets and lighting.",
+            "Moisture-resistant plasterboard false ceiling",
+            "Main stopcocks",
+            "Tiles and ceramics",
+            "LED lighting",
+            "Sockets and switches"
+        ],
+        "bathrooms": [
+            "Dismantling of accessories: shower tray/bathtub, sink and toilet",
+            "Demolition, tiling, electricity, plumbing, flooring.",
+            "Preliminary preparations: chasing, electricity and plumbing, wall rendering.",
+            "Complete plumbing: replacement of hot and cold water installation and drains.",
+            "Wall tiling",
+            "Floor laying",
+            "New electricity: sockets and lighting.",
+            "Moisture-resistant plasterboard false ceiling",
+            "Main stopcocks",
+            "Shower tray or bathtub",
+            "Toilet",
+            "Bathtub/shower faucet",
+            "Sink faucet",
+            "Sink",
+            "Tiles and ceramics",
+            "LED lighting",
+            "Socket and switch"
+        ],
+        "integral": [
+            "Demolition of non-structural partitions and elements",
+            "Complete renovation of electrical installation",
+            "Complete renovation of plumbing and sanitation",
+            "New tiling and flooring throughout the home",
+            "New interior carpentry (doors and wardrobes)",
+            "Complete painting of walls and ceilings",
+            "Kitchen renovation (basic furniture and appliances)",
+            "Bathroom renovation (sanitary ware and faucets)",
+            "Installation of false ceiling in wet areas",
+            "Waste management and final cleaning of the site"
+        ]
+    }
+}

@@ -1,0 +1,39 @@
+/**
+ * Entidad que define la configuración global para el cálculo de presupuestos.
+ * Estos valores se aplican sobre el coste de ejecución material (PEM) para obtener el precio de venta.
+ */
+export interface BudgetConfig {
+    id: string; // Habitualmente 'default'
+
+    // Porcentajes en formato decimal (ej: 0.13 para 13%)
+    overheadExpenses: number; // Gastos Generales
+    industrialBenefit: number; // Beneficio Industrial / Margen Comercial
+
+    // Impuestos
+    iva: number; // IVA aplicable por defecto (ej: 0.10 para reformas)
+
+    // Ajustes Manuales
+    globalAdjustmentFactor: number; // Factor multiplicador final (para ajuste fino)
+
+    // Tarifas Base
+    baseIntegralReformRateM2?: number; // Tarifa base por m2 para reformas integrales (ej: 650)
+
+    updatedAt: Date;
+    updatedBy: string;
+}
+
+export const DEFAULT_BUDGET_CONFIG: BudgetConfig = {
+    id: 'default',
+    overheadExpenses: 0.13, // 13% Gastos Generales
+    industrialBenefit: 0.06, // 6% Beneficio Industrial (Mínimo legal/técnico)
+    iva: 0.10, // 10% IVA Reducido
+    globalAdjustmentFactor: 1.0, // Sin ajuste extra
+    baseIntegralReformRateM2: 650, // 650€/m2 estandard
+    updatedAt: new Date(),
+    updatedBy: 'system'
+};
+
+export interface BudgetConfigRepository {
+    getConfig(): Promise<BudgetConfig>;
+    saveConfig(config: BudgetConfig): Promise<void>;
+}

@@ -1,109 +1,129 @@
-
 {
     "hero": {
-        "title": "Kompetente Bau- und Renovierungslösungen",
-        "subtitle": "Wir bieten eine breite Palette von Bau- und Handwerksdienstleistungen für Privathaushalte, Unternehmen und Industrieprojekte. Qualität und Vertrauen in jedem Ziegel.",
-        "cta": "Sofortangebot",
-        "ctaSecondary": "Unsere Dienstleistungen"
+        "title": "Wir verwandeln Räume <br/> <span class='text-primary italic'>in Erlebnisse</span>",
+        "subtitle": "Hochwertige Komplettrenovierungen auf Mallorca. Wo Qualität auf Exklusivität trifft.",
+        "cta": "Premium-Kostenvoranschlag anfordern",
+        "ctaSecondary": "Dienstleistungen entdecken"
     },
-    "services": {
-        "title": "Unsere spezialisierten Dienstleistungen",
-        "subtitle": "Vom Neubau bis zur Poolpflege ist unser Expertenteam bereit, Ihr Projekt zu verwirklichen.",
-        "detailsButton": "Mehr Details sehen"
+    "vision": {
+        "label": "Unsere Philosophie",
+        "title": "Die neue Ära des <br/> <span class='text-primary'>modernen Bauens</span>",
+        "description": "Bei Express Renovation Mallorca definieren wir den Standard für Luxusrenovierungen neu. Wir lassen die traditionelle Unsicherheit hinter uns und setzen auf technologische Präzision und handwerkliche Exzellenz.",
+        "points": [
+            "Zertifizierte europäische Qualitätsstandards.",
+            "3D-Visualisierungstechnologie vor Baubeginn.",
+            "Vertraglich festgelegte Festpreise und Termine.",
+            "Premium-Oberflächen und nachhaltige Materialien."
+        ],
+        "cta": "Erfahren Sie mehr über unsere Geschichte"
     },
-    "about": {
-        "title": "Über uns",
-        "description1": "Wir sind ein auf Renovierungen und Bau spezialisiertes Unternehmen. Wir sind seit 2003 in der Branche tätig und garantieren Ihnen höchste Seriosität, Verantwortung, Engagement und Professionalität, um Ihnen die besten Ergebnisse bei unseren Arbeiten zu liefern.",
-        "description2": "Unser Ruf basiert auf der Zufriedenheit unserer Kunden, weshalb wir uns bemühen, bei jedem Projekt die Erwartungen zu übertreffen. Unser Unternehmen ist die ideale Wahl für alle, die Qualität, Professionalität und Engagement suchen.",
-        "reason1": "Erfahrene Fachleute",
-        "reason2": "Qualität und Detailgenauigkeit",
-        "reason3": "Transparenz und Engagement"
+    "servicesGrid": {
+        "label": "Unsere Kompetenzen",
+        "title": "Exzellenz in jedem Detail",
+        "subtitle": "Wir beherrschen die Schlüsseldisziplinen, um außergewöhnliche Wohnräume zu schaffen.",
+        "items": [
+            {
+                "title": "Komplettrenovierungen",
+                "description": "Vollständige Umgestaltung von Wohn- und Gewerberäumen. Totale Koordination aller Gewerke.",
+                "link": "/servicios/reformas-integrales"
+            },
+            {
+                "title": "Designküchen",
+                "description": "Das Herz des Hauses, zum Inspirieren entworfen. Ergonomie, edle Materialien und Technologie.",
+                "link": "/servicios/cocinas"
+            },
+            {
+                "title": "Bäder & Wellness",
+                "description": "Private Entspannungsoasen. Regenduschen, freistehende Badewannen und Spa-Finish.",
+                "link": "/servicios/banos"
+            },
+            {
+                "title": "Außenbereiche & Landschaftsbau",
+                "description": "Terrassen, Pools und Gärten, die Ihren Lebensraum in die mallorquinische Natur erweitern.",
+                "link": "/servicios/exteriores"
+            },
+            {
+                "title": "Fassadenrestaurierung",
+                "description": "Wir stellen die ursprüngliche Pracht historischer und moderner Gebäude wieder her. Denkmalschonende Techniken.",
+                "link": "/servicios/fachadas"
+            },
+            {
+                "title": "SATE-Isolierung",
+                "description": "Überlegene Energieeffizienz. Thermische Außenverkleidung zur Reduzierung des Verbrauchs und Verbesserung des Komforts.",
+                "link": "/servicios/aislamiento"
+            }
+        ],
+        "cta": "Details ansehen"
     },
-    "process": {
-        "title": "Unser Arbeitsprozess",
-        "subtitle": "Wir führen Sie durch jeden Schritt, von der ersten Idee bis zur endgültigen Übergabe Ihres Projekts.",
-        "step1": {
-            "title": "Erstberatung",
-            "description": "Alles beginnt mit einem Gespräch, um Ihre Bedürfnisse, Ideen und Ihr Budget zu verstehen."
-        },
-        "step2": {
-            "title": "Planung & Angebot",
-            "description": "Wir erstellen einen detaillierten Plan und ein transparentes Angebot, das auf Ihre Vorgaben zugeschnitten ist."
-        },
-        "step3": {
-            "title": "Ausführung & Überwachung",
-            "description": "Unser Expertenteam führt das Projekt mit höchster Qualität und ständiger Überwachung aus."
-        },
-        "step4": {
-            "title": "Übergabe & Garantie",
-            "description": "Wir übergeben das fertige Projekt, stellen Ihre volle Zufriedenheit sicher und bieten eine Garantie auf unsere Arbeit."
-        },
-        "cta": {
-            "title": "Sehen Sie, wie einfach es ist? Fangen Sie jetzt an.",
-            "subtitle": "Machen Sie den ersten Schritt, um Ihr Projekt zu verwirklichen."
-        }
+    "transformations": {
+        "label": "Vorher & Nachher",
+        "title": "Reale Verwandlungen",
+        "subtitle": "Unsere Ergebnisse sprechen mehr als tausend Worte. Wischen Sie, um die Veränderung zu sehen.",
+        "sidebarTitle": "Bereit für Ihre Verwandlung?",
+        "sidebarDescription": "Jedes Projekt beginnt mit einer Vision. Wir helfen Ihnen, diese zu definieren und ohne Abweichungen umzusetzen.",
+        "sidebarStep1Title": "Strukturanalyse",
+        "sidebarStep1Desc": "Wir bewerten die technische Machbarkeit.",
+        "sidebarStep2Title": "Designvorschlag",
+        "sidebarStep2Desc": "Fotorealistische Renderings Ihres zukünftigen Zuhauses.",
+        "cta": "Vollständige Galerie ansehen"
     },
-    "projects": {
-        "title": "Ausgewählte Projekte",
-        "subtitle": "Ein Einblick in unsere Arbeit. Echte Projekte für zufriedene Kunden.",
-        "project1": {
-            "title": "Komplette Küchenrenovierung",
-            "category": "Innenarchitektur"
-        },
-        "project2": {
-            "title": "Designer-Schwimmbad",
-            "category": "Poolbau"
-        },
-        "project3": {
-            "title": "Fassadensanierung",
-            "category": "Vertikale Verkleidungen"
-        },
-        "project4": {
-            "title": "Moderne Badezimmerrenovierung",
-            "category": "Innenrenovierungen"
-        },
-        "project5": {
-            "title": "Elegante Küchenumgestaltung",
-            "category": "Küchendesign"
-        },
-        "project6": {
-            "title": "Badezimmer-Idee",
-            "category": "Badezimmer-Renovierungen"
-        },
-        "project7": {
-            "title": "Badezimmer-Inspiration",
-            "category": "Innenarchitektur"
-        },
-        "project8": {
-            "title": "Terrassenrenovierung",
-            "category": "Außendesign"
-        },
-        "project9": {
-            "title": "Gartenumgestaltung",
-            "category": "Gartenarbeit"
-        },
-        "project10": {
-            "title": "Lebendige Fassade",
-            "category": "Außendesign"
-        },
-        "cta": {
-            "title": "Starten Sie Ihr Projekt",
-            "subtitle": "Haben Sie eine Idee? Verwirklichen wir sie.",
-            "button": "Sofortangebot"
-        }
+    "processSteps": {
+        "label": "Absolute Transparenz",
+        "title": "Die Express-Methode: Keine Überraschungen",
+        "subtitle": "Ein linearer und vorhersehbarer Prozess für Ihre Sicherheit.",
+        "steps": [
+            {
+                "title": "Erstberatung",
+                "description": "Vor-Ort-Termin, um Ihre Bedürfnisse und Ihr Budget zu verstehen."
+            },
+            {
+                "title": "Design & Planung",
+                "description": "Erstellung von Plänen, 3D-Renderings und detailliertem Kostenvoranschlag."
+            },
+            {
+                "title": "Experten-Ausführung",
+                "description": "Bau unter ständiger Aufsicht und festen Terminen."
+            },
+            {
+                "title": "Schlüsselfertige Übergabe",
+                "description": "Endreinigung, Qualitätsprüfung und Schlüsselübergabe."
+            }
+        ]
     },
-    "testimonials": {
-        "title": "Was unsere Kunden sagen",
-        "subtitle": "Wir sind stolz auf unsere Arbeit und die Zufriedenheit derer, die uns vertrauen.",
-        "testimonial2": "Wir haben das Unternehmen für unser komplettes Renovierungsprojekt beauftragt und die Erfahrung war in jeder Hinsicht 5 Sterne wert. Die Qualität der Bauausführung ist tadellos, aber was ich am meisten hervorhebe, ist ihre Effizienz und die Einhaltung der Fristen. Sie sind wahre Bauexperten. Wenn Sie ein zuverlässiges Bauunternehmen suchen, das sein Handwerk versteht, sind Sie hier richtig.",
-        "customer2": "Gerson Agredo",
-        "testimonial3": "Wir haben das Unternehmen für unser komplettes Renovierungsprojekt beauftragt und die Erfahrung war in jeder Hinsicht 5 Sterne wert. Die Qualität der Bauausführung ist tadellos, aber was ich am meisten hervorhebe, ist ihre Effizienz und die Einhaltung der Fristen. Sie sind wahre Bauexperten. Wenn Sie ein zuverlässiges Bauunternehmen suchen, das sein Handwerk versteht, sind Sie hier richtig.",
-        "customer3": "Alex Castells",
-        "project": "Komplettsanierung"
+    "locations": {
+        "label": "Exklusive Abdeckung",
+        "title": "Renovierungen an den besten Standorten Mallorcas",
+        "subtitle": "Unsere Logistik und unser Team sind darauf vorbereitet, in den anspruchsvollsten Gegenden der Insel zu arbeiten, wobei Diskretion und die Einhaltung lokaler Vorschriften garantiert werden.",
+        "link": "Alle Einsatzgebiete ansehen"
     },
-    "finalCta": {
-        "title": "Bereit, Ihr Projekt zu starten?",
-        "subtitle": "Kontaktieren Sie uns noch heute für eine kostenlose, unverbindliche Beratung. Unser Team ist bereit, Ihnen zu helfen, Ihre Vision zu verwirklichen.",
-        "reviewLink": "Bewerten Sie unseren Service, es hilft uns zu wachsen!"
+    "faq": {
+        "label": "Fragen gelöst",
+        "title": "Expertise, die Ruhe schafft",
+        "subtitle": "Wir wissen, dass eine Renovierung Fragen aufwirft. Hier beantworten wir die häufigsten mit der Ehrlichkeit, die uns auszeichnet.",
+        "items": [
+            {
+                "question": "Wie lange dauert eine Komplettrenovierung auf Mallorca?",
+                "answer": "Die Zeit variiert je nach Komplexität, aber eine Standard-Komplettrenovierung dauert in der Regel zwischen 3 und 5 Monaten. Bei Express Renovation Mallorca garantieren wir vertraglich festgelegte Termine dank unserer Vorplanung mit 3D-Technologie, wodurch die üblichen Verzögerungen der Branche vermieden werden."
+            },
+            {
+                "question": "Kümmern Sie sich um Baugenehmigungen?",
+                "answer": "Ja, wir kümmern uns um den gesamten bürokratischen Prozess. Von der Beantragung kommunaler Lizenzen (große oder kleine Bauvorhaben) bis zur Verwaltung der Nutzung öffentlicher Straßen. Unser technisches Team kennt die Vorschriften jedes Rathauses im Detail."
+            },
+            {
+                "question": "Kann ich das Design vor Baubeginn sehen?",
+                "answer": "Absolut. Das ist ein grundlegender Teil unserer Express-Methode. Wir entwickeln fotorealistische Renderings und detaillierte Pläne, bevor der erste Stein gelegt wird, um sicherzustellen, dass das Endergebnis genau Ihrer Vision entspricht."
+            },
+            {
+                "question": "Arbeiten Sie mit Festpreisgarantie?",
+                "answer": "Ja. Unsere Transparenzpolitik eliminiert Überraschungen. Sobald Design und Materialien genehmigt sind, ist der Preis fix, es sei denn, Sie entscheiden sich während der Bauarbeiten für Änderungen."
+            }
+        ]
+    },
+    "cta": {
+        "title": "Ihr Projekt, Unsere Priorität",
+        "subtitle": "Überlassen Sie Ihre Investition nicht dem Zufall. Vereinbaren Sie eine kostenlose Beratung und entdecken Sie das wahre Potenzial Ihrer Immobilie.",
+        "buttonPrimary": "Jetzt Kostenvoranschlag anfordern",
+        "buttonSecondary": "Mit einem Agenten sprechen",
+        "note": "Begrenzte Plätze pro Monat zur Qualitätssicherung"
     }
 }

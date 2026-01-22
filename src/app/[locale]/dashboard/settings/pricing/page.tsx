@@ -18,7 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { getDictionary } from '@/lib/dictionaries';
-import { useEffect } from 'react';
+import { use, useEffect } from 'react';
 
 const formSchema = z.object({
   integral_basic: z.coerce.number().positive(),
@@ -36,18 +36,19 @@ type FormValues = z.infer<typeof formSchema>;
 
 // Mock initial data
 const initialPricingConfig = {
-    integral: { basic: 400, medium: 600, premium: 800 },
-    bathrooms: { basic: 1100, medium: 1250, premium: 1750 },
-    kitchen: { basic: 621, medium: 700, premium: 760 },
+  integral: { basic: 400, medium: 600, premium: 800 },
+  bathrooms: { basic: 1100, medium: 1250, premium: 1750 },
+  kitchen: { basic: 621, medium: 700, premium: 760 },
 };
 
-export default function PricingSettingsPage({ params: { locale } }: { params: { locale: any } }) {
+export default function PricingSettingsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = use(params);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [t, setT] = useState<any>(null);
 
   useEffect(() => {
-    getDictionary(locale).then(d => setT(d.pricingSettings));
+    getDictionary(locale as any).then(d => setT(d.pricingSettings));
   }, [locale]);
 
   const form = useForm<FormValues>({
@@ -151,7 +152,7 @@ export default function PricingSettingsPage({ params: { locale } }: { params: { 
               {renderCategoryFields('integral')}
               {renderCategoryFields('bathrooms')}
               {renderCategoryFields('kitchen')}
-              
+
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isLoading ? t.buttons.loading : t.buttons.save}

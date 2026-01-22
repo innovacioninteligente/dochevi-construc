@@ -1,0 +1,9 @@
+{
+    "title": "Welcome back",
+    "description": "Log in to your account to continue.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "button": "Log In",
+    "noAccount": "Don't have an account?",
+    "signupLink": "Sign up"
+}

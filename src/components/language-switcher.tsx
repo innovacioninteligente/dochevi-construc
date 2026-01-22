@@ -17,6 +17,7 @@ const languageMap: { [key: string]: string } = {
   ca: "Català",
   en: "English",
   de: "Deutsch",
+  nl: "Nederlands",
 }
 
 export function LanguageSwitcher() {
@@ -32,7 +33,17 @@ export function LanguageSwitcher() {
     const expires = "; expires=" + date.toUTCString()
     document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`
 
-    const newPath = currentPathname.replace(`/${currentLocale}`, `/${newLocale}`);
+    // Construct new path by replacing the locale segment
+    const segments = currentPathname.split('/');
+    // Check if the second segment is a valid locale (since path starts with /)
+    if (i18nConfig.locales.includes(segments[1])) {
+      segments[1] = newLocale;
+    } else {
+      // If no locale in path (e.g. default locale hidden), allow middleware/router to handle or splice it in
+      // With prefixDefault: true, this case is rare for valid routes, but safe to just splice
+      segments.splice(1, 0, newLocale);
+    }
+    const newPath = segments.join('/');
 
     router.push(newPath);
     router.refresh();

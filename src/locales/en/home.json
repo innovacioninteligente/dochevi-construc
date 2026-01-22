@@ -1,109 +1,129 @@
-
 {
     "hero": {
-        "title": "Expert construction and renovation solutions",
-        "subtitle": "We offer a wide range of construction and trade services for homes, businesses, and industrial projects. Quality and trust in every brick.",
-        "cta": "Instant Quote",
-        "ctaSecondary": "Our Services"
+        "title": "Transforming Spaces <br/> <span class='text-primary italic'>into Experiences</span>",
+        "subtitle": "High-end comprehensive renovations in Mallorca. Where quality meets exclusivity.",
+        "cta": "Request Premium Quote",
+        "ctaSecondary": "Discover Services"
     },
-    "services": {
-        "title": "Our Specialized Services",
-        "subtitle": "From new construction to pool maintenance, our team of experts is ready to make your project a reality.",
-        "detailsButton": "See more details"
+    "vision": {
+        "label": "Our Philosophy",
+        "title": "The New Era of <br/> <span class='text-primary'>Modern Construction</span>",
+        "description": "At Express Renovation Mallorca, we redefine the standard for luxury renovations. We leave behind traditional uncertainty to embrace technological precision and artisanal excellence.",
+        "points": [
+            "Certified European quality standards.",
+            "3D visualization technology before starting.",
+            "Fixed deadlines under contract.",
+            "Premium finishes and sustainable materials."
+        ],
+        "cta": "Learn our story"
     },
-    "about": {
-        "title": "About Us",
-        "description1": "We are a company specializing in renovations and construction. We have been in the sector since 2003, so we guarantee that you will receive the utmost seriousness, responsibility, commitment, and professionalism from us, providing you with the best results in the work we do.",
-        "description2": "Our reputation is built on client satisfaction, which is why we strive to exceed expectations on every project we undertake. Our company is the ideal choice for those seeking quality, professionalism, and commitment.",
-        "reason1": "Experienced Professionals",
-        "reason2": "Quality and Attention to Detail",
-        "reason3": "Transparency and Commitment"
+    "servicesGrid": {
+        "label": "Our Specialties",
+        "title": "Excellence in Every Detail",
+        "subtitle": "We master the key disciplines to create exceptional homes.",
+        "items": [
+            {
+                "title": "Comprehensive Renovations",
+                "description": "Complete transformation of residential and commercial spaces. Total coordination of trades.",
+                "link": "/servicios/reformas-integrales"
+            },
+            {
+                "title": "Designer Kitchens",
+                "description": "The heart of the home, designed to inspire. Ergonomics, noble materials, and technology.",
+                "link": "/servicios/cocinas"
+            },
+            {
+                "title": "Bathrooms & Wellness",
+                "description": "Private relaxation oases. Rain showers, freestanding bathtubs, and spa finishes.",
+                "link": "/servicios/banos"
+            },
+            {
+                "title": "Exteriors & Landscaping",
+                "description": "Terraces, pools, and gardens that extend your living space into Mallorca's nature.",
+                "link": "/servicios/exteriores"
+            },
+            {
+                "title": "Heritage Restoration",
+                "description": "Restoring the original splendor of historic and modern buildings. Techniques respectful of architectural heritage.",
+                "link": "/servicios/fachadas"
+            },
+            {
+                "title": "Thermal Insulation (SATE)",
+                "description": "Superior energy efficiency. External thermal cladding that reduces consumption and improves comfort.",
+                "link": "/servicios/aislamiento"
+            }
+        ],
+        "cta": "View details"
     },
-    "process": {
-        "title": "Our Work Process",
-        "subtitle": "We guide you every step of the way, from the initial idea to the final delivery of your project.",
-        "step1": {
-            "title": "Initial Consultation",
-            "description": "It all starts with a conversation to understand your needs, ideas, and budget."
-        },
-        "step2": {
-            "title": "Design & Quote",
-            "description": "We create a detailed plan and a transparent quote tailored to your specifications."
-        },
-        "step3": {
-            "title": "Execution & Supervision",
-            "description": "Our expert team executes the project with the highest quality and constant supervision."
-        },
-        "step4": {
-            "title": "Delivery & Guarantee",
-            "description": "We deliver the finished project, ensuring your complete satisfaction and offering a guarantee for our work."
-        },
-        "cta": {
-            "title": "See how easy it is? Start now.",
-            "subtitle": "Take the first step to make your project a reality."
-        }
+    "transformations": {
+        "label": "Before & After",
+        "title": "Real Transformations",
+        "subtitle": "Beyond words, our results speak. Swipe to see the change.",
+        "sidebarTitle": "Ready for your transformation?",
+        "sidebarDescription": "Every project starts with a vision. We help you define it and execute it without deviation.",
+        "sidebarStep1Title": "Structural Analysis",
+        "sidebarStep1Desc": "We evaluate technical feasibility.",
+        "sidebarStep2Title": "Design Proposal",
+        "sidebarStep2Desc": "Photorealistic renders of your future home.",
+        "cta": "View Full Gallery"
     },
-    "projects": {
-        "title": "Featured Projects",
-        "subtitle": "A showcase of our work. Real projects for satisfied clients.",
-        "project1": {
-            "title": "Complete Kitchen Renovation",
-            "category": "Interior Design"
-        },
-        "project2": {
-            "title": "Designer Swimming Pool",
-            "category": "Pool Construction"
-        },
-        "project3": {
-            "title": "Facade Rehabilitation",
-            "category": "Vertical Cladding"
-        },
-        "project4": {
-            "title": "Modern Bathroom Renovation",
-            "category": "Interior Renovations"
-        },
-        "project5": {
-            "title": "Elegant Kitchen Remodel",
-            "category": "Kitchen Design"
-        },
-        "project6": {
-            "title": "Bathroom Idea",
-            "category": "Bathroom Renovations"
-        },
-        "project7": {
-            "title": "Bathroom Inspiration",
-            "category": "Interior Design"
-        },
-        "project8": {
-            "title": "Terrace Renovation",
-            "category": "Exterior Design"
-        },
-        "project9": {
-            "title": "Garden Transformation",
-            "category": "Gardening"
-        },
-        "project10": {
-            "title": "Vibrant Facade",
-            "category": "Exterior Design"
-        },
-        "cta": {
-            "title": "Start Your Project",
-            "subtitle": "Got an idea? Let's make it real.",
-            "button": "Instant Quote"
-        }
+    "processSteps": {
+        "label": "Total Transparency",
+        "title": "The Express Method: No Surprises",
+        "subtitle": "A linear and predictable process designed for your peace of mind.",
+        "steps": [
+            {
+                "title": "Initial Consultation",
+                "description": "In-situ meeting to understand your needs and budget."
+            },
+            {
+                "title": "Design & Planning",
+                "description": "Creation of plans, 3D renders, and detailed budget."
+            },
+            {
+                "title": "Expert Execution",
+                "description": "Construction under constant supervision and fixed deadlines."
+            },
+            {
+                "title": "Turnkey Delivery",
+                "description": "Final cleaning, quality review, and key handover."
+            }
+        ]
     },
-    "testimonials": {
-        "title": "What our clients say",
-        "subtitle": "We are proud of the work we do and the satisfaction of those who trust us.",
-        "testimonial2": "We hired the company for our complete renovation project and the experience was 5 stars in every way. The quality of the construction is impeccable, but what I highlight most is their efficiency and respect for deadlines. They are true building experts. If you are looking for a reliable construction company that knows what it's doing, this is the one.",
-        "customer2": "Gerson Agredo",
-        "testimonial3": "We hired the company for our complete renovation project and the experience was 5 stars in every way. The quality of the construction is impeccable, but what I highlight most is their efficiency and respect for deadlines. They are true building experts. If you are looking for a reliable construction company that knows what it's doing, this is the one.",
-        "customer3": "Alex Castells",
-        "project": "Full Renovation"
+    "locations": {
+        "label": "Exclusive Coverage",
+        "title": "Renovations in Mallorca's Prime Locations",
+        "subtitle": "Our logistics and team are prepared to operate in the island's most demanding areas, guaranteeing discretion and compliance with local regulations.",
+        "link": "View all coverage areas"
     },
-    "finalCta": {
-        "title": "Ready to Start Your Project?",
-        "subtitle": "Contact us today for a free, no-obligation consultation. Our team is ready to help you bring your vision to life.",
-        "reviewLink": "Rate our service, it helps us grow!"
+    "faq": {
+        "label": "Questions Solved",
+        "title": "Expertise that Generates Peace of Mind",
+        "subtitle": "We know renovations generate questions. Here we answer the most common ones with the honesty that characterizes us.",
+        "items": [
+            {
+                "question": "How long does a comprehensive renovation take in Mallorca?",
+                "answer": "Time varies by complexity, but a standard comprehensive renovation usually takes between 3 and 5 months. At Express Renovation Mallorca, we guarantee fixed deadlines by contract thanks to our pre-planning with 3D technology, avoiding common industry delays."
+            },
+            {
+                "question": "Do you handle building permits?",
+                "answer": "Yes, we handle the entire bureaucratic process. From applying for municipal licenses (major or minor works) to managing public road occupation. Our technical team knows each town hall's regulations in detail."
+            },
+            {
+                "question": "Can I see the design before starting work?",
+                "answer": "Absolutely. It is a fundamental part of our Express Method. We develop photorealistic renders and detailed plans before laying the first brick, ensuring the final result matches your vision exactly."
+            },
+            {
+                "question": "Do you work with a closed budget?",
+                "answer": "Yes. Our transparency policy eliminates surprises. Once the design and materials are approved, the price is fixed, unless you decide to make changes during construction."
+            }
+        ]
+    },
+    "cta": {
+        "title": "Your Project, Our Priority",
+        "subtitle": "Don't leave your investment to chance. Schedule a free consultation and discover your property's real potential.",
+        "buttonPrimary": "Request Quote Now",
+        "buttonSecondary": "Speak with an Agent",
+        "note": "Limited spots per month to ensure quality"
     }
 }

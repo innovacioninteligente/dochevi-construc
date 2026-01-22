@@ -30,9 +30,9 @@ import { addDoc, collection } from 'firebase/firestore';
 import { getSafeDb } from '@/lib/firebase/client';
 
 const pricingConfig = {
-    integral: { basic: 400, medium: 600, premium: 800 },
-    bathrooms: { basic: 1100, medium: 1250, premium: 1750 },
-    kitchen: { basic: 621, medium: 700, premium: 760 },
+  integral: { basic: 400, medium: 600, premium: 800 },
+  bathrooms: { basic: 1100, medium: 1250, premium: 1750 },
+  kitchen: { basic: 621, medium: 700, premium: 760 },
 };
 
 const formSchema = z.object({
@@ -82,21 +82,21 @@ export function QuickBudgetForm({ t }: { t: any; }) {
         budget = values.squareMeters * prices[values.quality as keyof typeof prices];
         setCalculatedBudget(budget);
       }
-      
+
       const db = getSafeDb();
       const mailCollection = collection(db, 'mail');
-      
+
       const isTestEmail = values.testEmail && values.testEmail.trim() !== '';
       const recipientEmail = isTestEmail ? values.testEmail : 'your-email@example.com';
-      const subject = isTestEmail 
+      const subject = isTestEmail
         ? '[EMAIL DE PRUEBA] Nueva Solicitud de Presupuesto Rápido'
         : 'Nueva Solicitud de Presupuesto Rápido';
 
       await addDoc(mailCollection, {
         to: [recipientEmail],
         message: {
-            subject: subject,
-            html: `
+          subject: subject,
+          html: `
                 <h1>Nueva Solicitud de Presupuesto Rápido</h1>
                 <p>Se ha recibido una nueva solicitud de presupuesto a través del formulario rápido de la web.</p>
                 <h2>Detalles del Cliente:</h2>
@@ -143,53 +143,53 @@ export function QuickBudgetForm({ t }: { t: any; }) {
     setIsSubmitted(false);
     setCalculatedBudget(null);
   }
-  
+
   if (isSubmitted) {
     const isPool = watchRenovationType === 'pool';
     const reviewLink = "#"; // Replace with your GMB review link
 
     return (
-        <div className="text-center max-w-2xl mx-auto">
-            <Card>
-                <CardHeader>
-                    <div className='mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4'>
-                        <MailCheck className='w-12 h-12 text-primary' />
-                    </div>
-                    <CardTitle className="font-headline text-3xl">{t.budgetRequest.confirmation.title}</CardTitle>
-                    <CardDescription className="text-lg">{t.budgetRequest.confirmation.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {isPool ? (
-                        <p className="text-muted-foreground mt-4">{t.budgetRequest.confirmation.poolMessage}</p>
-                    ) : (
-                        <>
-                            <p className='text-muted-foreground text-lg'>Tu presupuesto estimado es:</p>
-                            <p className='font-headline text-4xl font-bold text-primary my-4'>
-                                {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(calculatedBudget || 0)}
-                            </p>
-                            <p className="text-muted-foreground mt-4 text-sm">{t.budgetRequest.confirmation.noCostMessage}</p>
-                        </>
-                    )}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-                        <Button asChild>
-                            <a href='/'>{t.budgetRequest.confirmation.button}</a>
-                        </Button>
-                        <Button variant="outline" onClick={handleRestart}>
-                            <RotateCw className="mr-2 h-4 w-4" />
-                            {t.budgetRequest.confirmation.restartForm}
-                        </Button>
-                    </div>
-                     <div className="mt-8">
-                        <Button asChild variant="secondary">
-                            <Link href={reviewLink} target="_blank" rel="noopener noreferrer">
-                                <Star className="mr-2 h-4 w-4" />
-                                {t.budgetRequest.confirmation.reviewButton}
-                            </Link>
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+      <div className="text-center max-w-2xl mx-auto">
+        <Card>
+          <CardHeader>
+            <div className='mx-auto bg-primary/10 p-4 rounded-full w-fit mb-4'>
+              <MailCheck className='w-12 h-12 text-primary' />
+            </div>
+            <CardTitle className="font-headline text-3xl">{t.budgetRequest.confirmation.title}</CardTitle>
+            <CardDescription className="text-lg">{t.budgetRequest.confirmation.description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isPool ? (
+              <p className="text-muted-foreground mt-4">{t.budgetRequest.confirmation.poolMessage}</p>
+            ) : (
+              <>
+                <p className='text-muted-foreground text-lg'>Tu presupuesto estimado es:</p>
+                <p className='font-headline text-4xl font-bold text-primary my-4'>
+                  {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(calculatedBudget || 0)}
+                </p>
+                <p className="text-muted-foreground mt-4 text-sm">{t.budgetRequest.confirmation.noCostMessage}</p>
+              </>
+            )}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+              <Button asChild>
+                <a href='/'>{t.budgetRequest.confirmation.button}</a>
+              </Button>
+              <Button variant="outline" onClick={handleRestart}>
+                <RotateCw className="mr-2 h-4 w-4" />
+                {t.budgetRequest.confirmation.restartForm}
+              </Button>
+            </div>
+            <div className="mt-8">
+              <Button asChild variant="secondary">
+                <Link href={reviewLink} target="_blank" rel="noopener noreferrer">
+                  <Star className="mr-2 h-4 w-4" />
+                  {t.budgetRequest.confirmation.reviewButton}
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
@@ -218,7 +218,7 @@ export function QuickBudgetForm({ t }: { t: any; }) {
                 )} />
               </div>
               <div className={`grid ${watchRenovationType === 'pool' ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
-                 <FormField control={form.control} name="renovationType" render={({ field }) => (
+                <FormField control={form.control} name="renovationType" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t.budgetRequest.quickForm.renovationType.label}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -233,44 +233,44 @@ export function QuickBudgetForm({ t }: { t: any; }) {
                     <FormMessage />
                   </FormItem>
                 )} />
-                 <FormField control={form.control} name="squareMeters" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{t.budgetRequest.quickForm.squareMeters.label}</FormLabel>
-                        <FormControl><Input type="number" {...field} /></FormControl>
-                        <FormMessage />
-                    </FormItem>
+                <FormField control={form.control} name="squareMeters" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t.budgetRequest.quickForm.squareMeters.label}</FormLabel>
+                    <FormControl><Input type="number" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )} />
-                 {watchRenovationType !== 'pool' && (
-                    <FormField control={form.control} name="quality" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{t.budgetRequest.form.quality.label}</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl><SelectTrigger><SelectValue placeholder={t.budgetRequest.form.quality.placeholder} /></SelectTrigger></FormControl>
-                                <SelectContent>
-                                    <SelectItem value="basic">{t.budgetRequest.form.quality.options.basic}</SelectItem>
-                                    <SelectItem value="medium">{t.budgetRequest.form.quality.options.medium}</SelectItem>
-                                    <SelectItem value="premium">{t.budgetRequest.form.quality.options.premium}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
-                 )}
+                {watchRenovationType !== 'pool' && (
+                  <FormField control={form.control} name="quality" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t.budgetRequest.form.quality.label}</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder={t.budgetRequest.form.quality.placeholder} /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="basic">{t.budgetRequest.form.quality.options.basic}</SelectItem>
+                          <SelectItem value="medium">{t.budgetRequest.form.quality.options.medium}</SelectItem>
+                          <SelectItem value="premium">{t.budgetRequest.form.quality.options.premium}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                )}
               </div>
 
-               {inclusionItems.length > 0 && (
+              {inclusionItems.length > 0 && (
                 <div className='p-6 bg-secondary/50 rounded-lg'>
-                    <h3 className='font-semibold mb-4 text-center'>{tInclusions.title} {t.budgetRequest.quickForm.renovationType.options[watchRenovationType as keyof typeof t.budgetRequest.quickForm.renovationType.options]}:</h3>
-                    <ul className='grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-muted-foreground'>
-                        {inclusionItems.map((item: string, index: number) => (
-                            <li key={index} className='flex items-start'>
-                                <Check className='w-4 h-4 mr-2 mt-0.5 text-primary flex-shrink-0' />
-                                <span>{item}</span>
-                            </li>
-                        ))}
-                    </ul>
+                  <h3 className='font-semibold mb-4 text-center'>{tInclusions.title} {t.budgetRequest.quickForm.renovationType.options[watchRenovationType as keyof typeof t.budgetRequest.quickForm.renovationType.options]}:</h3>
+                  <ul className='grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-muted-foreground'>
+                    {inclusionItems.map((item: string, index: number) => (
+                      <li key={index} className='flex items-start'>
+                        <Check className='w-4 h-4 mr-2 mt-0.5 text-primary flex-shrink-0' />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-               )}
+              )}
 
               <div className="flex flex-col sm:flex-row justify-end items-center gap-4 mt-8">
                 <FormField control={form.control} name="testEmail" render={({ field }) => (

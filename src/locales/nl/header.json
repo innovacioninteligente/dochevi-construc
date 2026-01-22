@@ -1,0 +1,17 @@
+
+{
+    "nav": {
+        "services": "Services",
+        "budgetRequest": "Instant Quote",
+        "blog": "Blog",
+        "contact": "Contact",
+        "login": "Log In",
+        "signup": "Sign Up"
+    },
+    "userNav": {
+        "dashboard": "Dashboard",
+        "newBudget": "New Budget",
+        "settings": "Settings",
+        "logout": "Log Out"
+    }
+}

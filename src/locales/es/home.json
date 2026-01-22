@@ -1,109 +1,129 @@
-
 {
     "hero": {
-        "title": "Soluciones expertas de construcción y reformas",
-        "subtitle": "Ofrecemos una amplia gama de servicios de construcción y oficios para hogares, negocios y proyectos industriales. Calidad y confianza en cada ladrillo.",
-        "cta": "Presupuesto al instante",
-        "ctaSecondary": "Nuestros Servicios"
+        "title": "Transformamos Espacios <br/> <span class='text-primary italic'>en Experiencias</span>",
+        "subtitle": "Reformas integrales de alta gama en Mallorca. Donde la calidad se encuentra con la exclusividad.",
+        "cta": "Solicitar Presupuesto Premium",
+        "ctaSecondary": "Descubrir Servicios"
     },
-    "services": {
-        "title": "Nuestros Servicios Especializados",
-        "subtitle": "Desde obra nueva hasta el mantenimiento de su piscina, nuestro equipo de expertos está listo para hacer realidad su proyecto.",
-        "detailsButton": "Ver más detalles"
+    "vision": {
+        "label": "Nuestra Filosofía",
+        "title": "La Nueva Era de la <br/> <span class='text-primary'>Construcción Moderna</span>",
+        "description": "En Express Renovation Mallorca, redefinimos el estándar de las reformas de lujo. Dejamos atrás la incertidumbre tradicional para abrazar la precisión tecnológica y la excelencia artesanal.",
+        "points": [
+            "Estándares de calidad europeos certificados.",
+            "Tecnología de visualización 3D antes de empezar.",
+            "Plazos cerrados bajo contrato.",
+            "Acabados premium y materiales sostenibles."
+        ],
+        "cta": "Conoce nuestra historia"
     },
-    "about": {
-        "title": "Sobre Nosotros",
-        "description1": "Somos una empresa especializada en reformas y construcción. Estamos desde el 2003 en el sector, por lo que te garantizamos que recibirás de nuestra parte la máxima seriedad, responsabilidad, compromiso y profesionalidad, brindándote los mejores resultados en los trabajos que realizamos.",
-        "description2": "Nuestra reputación se basa en la satisfacción del cliente, por lo que nos esforzamos por superar las expectativas en cada proyecto que emprendemos. Nuestra empresa es la elección ideal para aquellos que buscan calidad, profesionalismo y compromiso.",
-        "reason1": "Profesionales Experimentados",
-        "reason2": "Calidad y Atención al Detalle",
-        "reason3": "Transparencia y Compromiso"
+    "servicesGrid": {
+        "label": "Nuestras Especialidades",
+        "title": "Excelencia en Cada Detalle",
+        "subtitle": "Dominamos las disciplinas clave para crear hogares excepcionales.",
+        "items": [
+            {
+                "title": "Reformas Integrales",
+                "description": "Transformación completa de espacios residenciales y comerciales. Coordinación total de gremios.",
+                "link": "/servicios/reformas-integrales"
+            },
+            {
+                "title": "Cocinas de Diseño",
+                "description": "El corazón del hogar, diseñado para inspirar. Ergonomía, materiales nobles y tecnología.",
+                "link": "/servicios/cocinas"
+            },
+            {
+                "title": "Baños & Wellness",
+                "description": "Oasis de relajación privados. Duchas de lluvia, bañeras exentas y acabados spa.",
+                "link": "/servicios/banos"
+            },
+            {
+                "title": "Exteriores & Paisajismo",
+                "description": "Terrazas, piscinas y jardines que extienden tu espacio vital hacia la naturaleza mallorquina.",
+                "link": "/servicios/exteriores"
+            },
+            {
+                "title": "Restauración de Fachadas",
+                "description": "Recuperamos el esplendor original de edificios históricos y modernos. Técnicas respetuosas con el patrimonio.",
+                "link": "/servicios/fachadas"
+            },
+            {
+                "title": "Aislamiento SATE",
+                "description": "Eficiencia energética superior. Revestimiento térmico exterior que reduce el consumo y mejora el confort.",
+                "link": "/servicios/aislamiento"
+            }
+        ],
+        "cta": "Ver detalles"
     },
-    "process": {
-        "title": "Nuestro Proceso de Trabajo",
-        "subtitle": "Te guiamos en cada paso del camino, desde la idea inicial hasta la entrega final de tu proyecto.",
-        "step1": {
-            "title": "Consulta Inicial",
-            "description": "Todo empieza con una conversación para entender tus necesidades, ideas y presupuesto."
-        },
-        "step2": {
-            "title": "Diseño y Presupuesto",
-            "description": "Creamos un plan detallado y un presupuesto transparente adaptado a tus especificaciones."
-        },
-        "step3": {
-            "title": "Ejecución y Supervisión",
-            "description": "Nuestro equipo de expertos ejecuta el proyecto con la máxima calidad y supervisión constante."
-        },
-        "step4": {
-            "title": "Entrega y Garantía",
-            "description": "Entregamos el proyecto terminado, asegurando tu total satisfacción y ofreciendo garantía por nuestro trabajo."
-        },
-        "cta": {
-            "title": "¿Ves qué fácil? Empieza ahora.",
-            "subtitle": "Da el primer paso para hacer realidad tu proyecto."
-        }
+    "transformations": {
+        "label": "Antes y Después",
+        "title": "Transformaciones Reales",
+        "subtitle": "Más allá de las palabras, nuestros resultados hablan. Desliza para ver el cambio.",
+        "sidebarTitle": "¿Listo para tu transformación?",
+        "sidebarDescription": "Cada proyecto comienza con una visión. Nosotros te ayudamos a definirla y ejecutarla sin desviaciones.",
+        "sidebarStep1Title": "Análisis Estructural",
+        "sidebarStep1Desc": "Evaluamos la viabilidad técnica.",
+        "sidebarStep2Title": "Propuesta de Diseño",
+        "sidebarStep2Desc": "Renders fotorrealistas de tu futuro hogar.",
+        "cta": "Ver Galería Completa"
     },
-    "projects": {
-        "title": "Proyectos Destacados",
-        "subtitle": "Una muestra de nuestro trabajo. Proyectos reales para clientes satisfechos.",
-        "project1": {
-            "title": "Reforma Integral de Cocina",
-            "category": "Diseño de Interiores"
-        },
-        "project2": {
-            "title": "Piscina de Diseño",
-            "category": "Construcción de Piscinas"
-        },
-        "project3": {
-            "title": "Rehabilitación de Fachada",
-            "category": "Paramentos Verticales"
-        },
-        "project4": {
-            "title": "Reforma de Baño Moderno",
-            "category": "Reformas de Interiores"
-        },
-        "project5": {
-            "title": "Renovación de Cocina Elegante",
-            "category": "Diseño de Cocinas"
-        },
-        "project6": {
-            "title": "Idea para Baño",
-            "category": "Reformas de Baños"
-        },
-        "project7": {
-            "title": "Inspiración para Baño",
-            "category": "Diseño de Interiores"
-        },
-        "project8": {
-            "title": "Renovación de Terraza",
-            "category": "Diseño de Exteriores"
-        },
-        "project9": {
-            "title": "Transformación de Jardín",
-            "category": "Jardinería"
-        },
-        "project10": {
-            "title": "Fachada Vibrante",
-            "category": "Diseño Exterior"
-        },
-        "cta": {
-            "title": "Comienza tu Proyecto",
-            "subtitle": "¿Tienes una idea? Hagámosla realidad.",
-            "button": "Presupuesto al instante"
-        }
+    "processSteps": {
+        "label": "Transparencia Total",
+        "title": "El Método Express: Sin Sorpresas",
+        "subtitle": "Un proceso lineal y predecible diseñado para tu tranquilidad.",
+        "steps": [
+            {
+                "title": "Consulta Inicial",
+                "description": "Reunión in-situ para entender tus necesidades y presupuesto."
+            },
+            {
+                "title": "Diseño & Planificación",
+                "description": "Creación de planos, renders 3D y presupuesto detallado."
+            },
+            {
+                "title": "Ejecución Experta",
+                "description": "Construcción bajo supervisión constante y plazos fijos."
+            },
+            {
+                "title": "Entrega Llave en Mano",
+                "description": "Limpieza final, revisión de calidad y entrega de llaves."
+            }
+        ]
     },
-    "testimonials": {
-        "title": "La opinión de nuestros clientes",
-        "subtitle": "Nos enorgullece el trabajo que hacemos y la satisfacción de quienes confían en nosotros.",
-        "testimonial2": "Contratamos a la empresa para nuestro proyecto de reforma integral y la experiencia fue de 5 estrellas en todo sentido. La calidad de la construcción es impecable, pero lo que más destaco es su eficiencia y el respeto por los plazos. Son verdaderos expertos en edificación. Si buscas una constructora de confianza que sepa lo que hace, esta es la opción.",
-        "customer2": "Gerson Agredo",
-        "testimonial3": "Contratamos a la empresa para nuestro proyecto de reforma integral y la experiencia fue de 5 estrellas en todo sentido. La calidad de la construcción es impecable, pero lo que más destaco es su eficiencia y el respeto por los plazos. Son verdaderos expertos en edificación. Si buscas una constructora de confianza que sepa lo que hace, esta es la opción.",
-        "customer3": "Alex Castells",
-        "project": "Reforma Integral"
+    "locations": {
+        "label": "Cobertura Exclusiva",
+        "title": "Reformas en las Mejores Ubicaciones de Mallorca",
+        "subtitle": "Nuestra logística y equipo están preparados para operar en las zonas más exigentes de la isla, garantizando discreción y cumplimiento de normativas locales.",
+        "link": "Ver todas las zonas de actuación"
     },
-    "finalCta": {
-        "title": "¿Listo para Empezar tu Proyecto?",
-        "subtitle": "Contáctanos hoy mismo para obtener una consulta gratuita y sin compromiso. Nuestro equipo está listo para ayudarte a hacer realidad tu visión.",
-        "reviewLink": "Valora nuestro servicio, ¡nos ayuda a crecer!"
+    "faq": {
+        "label": "Dudas Resueltas",
+        "title": "Expertise que Genera Tranquilidad",
+        "subtitle": "Sabemos que una reforma genera preguntas. Aquí respondemos a las más habituales con la honestidad que nos caracteriza.",
+        "items": [
+            {
+                "question": "¿Cuánto tarda una reforma integral en Mallorca?",
+                "answer": "El tiempo varía según la complejidad, pero una reforma integral estándar suele oscilar entre 3 y 5 meses. En Express Renovation Mallorca, garantizamos plazos cerrados por contrato gracias a nuestra planificación previa con tecnología 3D, evitando los retrasos habituales del sector."
+            },
+            {
+                "question": "¿Gestionáis las licencias de obra?",
+                "answer": "Sí, nos encargamos de todo el proceso burocrático. Desde la solicitud de licencias municipales (obra mayor o menor) hasta la gestión de ocupación de vía pública. Nuestro equipo técnico conoce al detalle las normativas de cada ayuntamiento."
+            },
+            {
+                "question": "¿Puedo ver el diseño antes de empezar la obra?",
+                "answer": "Absolutamente. Es parte fundamental de nuestro Método Express. Desarrollamos renders fotorrealistas y planos detallados antes de poner el primer ladrillo, asegurando que el resultado final coincida exactamente con tu visión."
+            },
+            {
+                "question": "¿Trabajáis con presupuesto cerrado?",
+                "answer": "Sí. Nuestra política de transparencia elimina las sorpresas. Una vez aprobado el diseño y los materiales, el precio es fijo, salvo que tú decidas realizar cambios durante la obra."
+            }
+        ]
+    },
+    "cta": {
+        "title": "Tu Proyecto, Nuestra Prioridad",
+        "subtitle": "No dejes tu inversión en manos del azar. Agenda una consulta gratuita y descubre el potencial real de tu propiedad.",
+        "buttonPrimary": "Solicitar Presupuesto Ahora",
+        "buttonSecondary": "Hablar con un Agente",
+        "note": "Plazas limitadas por mes para garantizar calidad"
     }
 }

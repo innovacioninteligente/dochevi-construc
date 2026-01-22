@@ -3,8 +3,10 @@ import { DetailedFormValues } from '../schema';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { RadioCard } from '@/components/ui/radio-card';
+import { ChefHat, Hammer, Droplets, Grid3X3 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface KitchenStepProps {
   form: UseFormReturn<DetailedFormValues>;
@@ -12,91 +14,103 @@ interface KitchenStepProps {
 }
 
 export const KitchenStep = ({ form, t }: KitchenStepProps) => {
-  const projectScope = form.watch('projectScope');
-  const partialScope = form.watch('partialScope') || [];
   const commonT = t.budgetRequest.form;
 
-  const showKitchenForm = projectScope === 'integral' || (projectScope === 'partial' && partialScope.includes('kitchen'));
-
-  if (!showKitchenForm) {
-      return null;
-  }
-
-  const defaultAccordionValue = (projectScope === 'partial' && partialScope.includes('kitchen')) ? "kitchen-renovation" : undefined;
+  // We assume this component is only rendered if Kitchen is selected (handled by Wizard logic)
+  // To avoid "closed state", we remove the Accordion and just show the form content directly
+  // or use a Card that is always visible.
 
   return (
-    <div className="space-y-6">
-      <Accordion type="single" collapsible className="w-full" defaultValue={defaultAccordionValue}>
-        <AccordionItem value="kitchen-renovation">
-          <AccordionTrigger>Reforma de Cocina</AccordionTrigger>
-          <AccordionContent className="space-y-6 pt-4">
-             <div className="space-y-6 pl-4 border-l-2 ml-4">
-              <FormField
-                control={form.control}
-                name="kitchen.quality"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{commonT.quality.label}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger><SelectValue placeholder={commonT.quality.placeholder} /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="basic">{commonT.quality.options.basic}</SelectItem>
-                        <SelectItem value="medium">{commonT.quality.options.medium}</SelectItem>
-                        <SelectItem value="premium">{commonT.quality.options.premium}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="kitchen.demolition"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 text-left">
-                    <FormLabel>{commonT.kitchen.kitchenDemolition.label}</FormLabel>
-                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="kitchen.wallTilesM2"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{commonT.kitchen.kitchenWallTilesM2.label}</FormLabel>
-                    <FormControl><Input type="number" placeholder="25" {...field} value={field.value || ''} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="kitchen.floorM2"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{commonT.kitchen.kitchenFloorM2.label}</FormLabel>
-                    <FormControl><Input type="number" placeholder="12" {...field} value={field.value || ''} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="kitchen.plumbing"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 text-left">
-                    <FormLabel>{commonT.kitchen.kitchenPlumbing.label}</FormLabel>
-                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+    <div className="space-y-8 animate-in fade-in-50 duration-500 text-left">
+
+      <div className='flex items-center gap-3 mb-4'>
+        <div className='bg-orange-100 p-3 rounded-full text-orange-600'>
+          <ChefHat className="w-6 h-6" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold font-headline">Reforma de Cocina</h3>
+          <p className="text-muted-foreground text-sm">Define los acabados y trabajos necesarios</p>
+        </div>
+      </div>
+
+      <Card className="p-6">
+        <CardContent className="space-y-6 p-0">
+          {/* QUALITY */}
+          <FormField
+            control={form.control}
+            name="kitchen.quality"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel className="font-semibold">{commonT.quality.label}</FormLabel>
+                <FormControl>
+                  <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <RadioCard value="basic" label="Básica" description="Funcional y económica." className="p-3" />
+                    <RadioCard value="medium" label="Media" description="Equilibrio calidad/precio." className="p-3 border-primary/40 bg-primary/5" />
+                    <RadioCard value="premium" label="Premium" description="Acabados de lujo." className="p-3" />
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* DEMOLITION & PLUMBING */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="kitchen.demolition"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/20">
+                  <div className="flex items-center gap-2">
+                    <Hammer className="w-5 h-5 text-muted-foreground" />
+                    <FormLabel className="font-medium cursor-pointer">{commonT.kitchen.kitchenDemolition.label}</FormLabel>
+                  </div>
+                  <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="kitchen.plumbing"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/20">
+                  <div className="flex items-center gap-2">
+                    <Droplets className="w-5 h-5 text-blue-500" />
+                    <FormLabel className="font-medium cursor-pointer">{commonT.kitchen.kitchenPlumbing.label}</FormLabel>
+                  </div>
+                  <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* SURFACES */}
+          <div className="grid grid-cols-2 gap-6 border-t pt-4">
+            <FormField
+              control={form.control}
+              name="kitchen.wallTilesM2"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><Grid3X3 className="w-4 h-4" /> Paredes (m²)</FormLabel>
+                  <FormControl><Input type="number" placeholder="25" {...field} value={field.value || ''} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="kitchen.floorM2"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><Grid3X3 className="w-4 h-4" /> Suelo (m²)</FormLabel>
+                  <FormControl><Input type="number" placeholder="12" {...field} value={field.value || ''} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

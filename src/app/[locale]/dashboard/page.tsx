@@ -8,12 +8,13 @@ import { User } from 'firebase/auth';
 // We need to find a way to get user on the server.
 // For now, let's mock it.
 const mockUser = {
-    displayName: 'Usuario',
-    email: 'user@example.com'
+  displayName: 'Usuario',
+  email: 'user@example.com'
 }
 
-export default async function DashboardPage({ params: { locale } }: { params: { locale: any } }) {
-  const dict = await getDictionary(locale);
+export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const dict = await getDictionary(locale as any);
   const t = dict.dashboard;
   const user = mockUser; // Should be replaced with actual user from server session
 
@@ -30,7 +31,7 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
       description: t.seoGenerator.description,
       icon: <Lightbulb className="w-8 h-8 text-primary" />,
     },
-     {
+    {
       href: '/dashboard/my-budgets',
       title: 'Mis Presupuestos',
       description: 'Ver y gestionar tus solicitudes de presupuesto anteriores.',
@@ -53,12 +54,12 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
             <Card className="h-full flex flex-col justify-between hover:border-primary transition-colors">
               <CardHeader>
                 <div className="flex items-start justify-between">
-                    {card.icon}
-                    <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                  {card.icon}
+                  <ArrowRight className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div className='pt-4'>
-                    <CardTitle className="text-xl font-headline">{card.title}</CardTitle>
-                    <CardDescription className="pt-2">{card.description}</CardDescription>
+                  <CardTitle className="text-xl font-headline">{card.title}</CardTitle>
+                  <CardDescription className="pt-2">{card.description}</CardDescription>
                 </div>
               </CardHeader>
             </Card>

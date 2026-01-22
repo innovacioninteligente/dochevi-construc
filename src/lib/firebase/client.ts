@@ -44,4 +44,18 @@ const getSafeDb = (): Firestore => {
   return db;
 }
 
-export { app, getSafeAuth, getSafeDb };
+// Initialize Storage
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
+let storage: FirebaseStorage | null = null;
+if (app) {
+  storage = getStorage(app);
+}
+
+const getSafeStorage = (): FirebaseStorage => {
+  if (!storage) {
+    throw new Error("Firebase Storage is not initialized.");
+  }
+  return storage;
+}
+
+export { app, getSafeAuth, getSafeDb, getSafeStorage };
