@@ -13,6 +13,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
 
     return (
         <>
+            <Header t={dict} />
             <main className="flex-1 pt-20">
                 <div className="container-limited py-12 text-center">
                     <h1 className="font-headline text-5xl font-bold mb-4">{dict.header.nav.services}</h1>
@@ -22,6 +23,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
                 </div>
                 <ServicesGrid t={dict.home.servicesGrid} />
             </main>
+            <Footer t={dict} />
         </>
     );
 }

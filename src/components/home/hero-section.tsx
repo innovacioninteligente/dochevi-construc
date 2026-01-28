@@ -42,13 +42,13 @@ export function HeroSection({ t }: { t: any }) {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                    className="max-w-5xl mx-auto space-y-8 p-8 md:p-12 rounded-3xl bg-white/5 backdrop-blur-[2px] border border-white/10 shadow-2xl"
+                    className="max-w-5xl mx-auto space-y-6 md:space-y-8 p-6 md:p-12 rounded-3xl bg-white/5 backdrop-blur-[2px] border border-white/10 shadow-2xl"
                 >
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="font-headline text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-[#FDFBF7] drop-shadow-lg leading-[1.1]"
+                        className="font-headline text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-[#FDFBF7] drop-shadow-lg leading-[1.1]"
                         dangerouslySetInnerHTML={{ __html: t.title }}
                     />
 
@@ -65,12 +65,12 @@ export function HeroSection({ t }: { t: any }) {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.8 }}
-                        className="flex flex-col sm:flex-row gap-6 justify-center pt-8"
+                        className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center pt-4 sm:pt-8"
                     >
-                        <Button size="lg" onClick={() => openWidget('general')} className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-7 rounded-full shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)] hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.6)] transition-all duration-300 transform hover:-translate-y-1">
+                        <Button size="lg" onClick={() => openWidget('general')} className="bg-primary text-primary-foreground hover:bg-primary/90 text-base md:text-lg px-6 py-5 md:px-10 md:py-7 rounded-full shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)] hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.6)] transition-all duration-300 transform hover:-translate-y-1 h-auto w-full sm:w-auto">
                             {t.cta}
                         </Button>
-                        <Button asChild variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/10 hover:border-white bg-transparent text-lg px-10 py-7 rounded-full backdrop-blur-sm transition-all duration-300">
+                        <Button asChild variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/10 hover:border-white bg-transparent text-base md:text-lg px-6 py-5 md:px-10 md:py-7 rounded-full backdrop-blur-sm transition-all duration-300 h-auto w-full sm:w-auto">
                             <Link href="/services">{t.ctaSecondary}</Link>
                         </Button>
                     </motion.div>
