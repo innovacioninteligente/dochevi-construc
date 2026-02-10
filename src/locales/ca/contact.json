@@ -13,12 +13,15 @@
         "button": "Enviar Missatge"
     },
     "address": {
-        "label": "La Nostra Oficina"
+        "label": "Ubicació",
+        "value": "Petra, Mallorca"
     },
     "phone": {
-        "label": "Telèfon"
+        "label": "Telèfon",
+        "value": "+34 674 26 69 69"
     },
     "email": {
-        "label": "Correu electrònic"
+        "label": "Correu electrònic",
+        "value": "info@gruporg.com"
     }
 }
