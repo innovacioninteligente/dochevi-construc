@@ -3,6 +3,7 @@ export interface PersonalInfo {
     name: string;
     email: string;
     phone: string;
+    address?: string; // Added for Budget Client Snapshot
 }
 
 export interface LeadPreferences {

@@ -7,4 +7,5 @@ export interface ConversationRepository {
     findByLeadId(leadId: string): Promise<Conversation[]>;
     findActive(): Promise<Conversation[]>; // For admin dashboard
     findRecent(limit: number): Promise<Conversation[]>;
+    delete(id: string): Promise<void>;
 }

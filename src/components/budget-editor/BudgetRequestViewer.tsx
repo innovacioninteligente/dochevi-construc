@@ -7,26 +7,105 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { sendQuickQuoteAction } from "@/actions/budget/send-quick-quote.action";
+import { convertToFullBudgetAction } from "@/actions/budget/convert-to-full.action";
+import { Loader2, Send, FileCode, CheckCircle2 } from "lucide-react";
+
 interface BudgetRequestViewerProps {
     budget: Budget;
+    isAdmin?: boolean;
 }
 
-export function BudgetRequestViewer({ budget }: BudgetRequestViewerProps) {
-    const { clientData, type, createdAt } = budget;
+export function BudgetRequestViewer({ budget, isAdmin = false }: BudgetRequestViewerProps) {
+    const { clientSnapshot, type, createdAt } = budget;
     // Cast clientData based on type for safety within this scope, though we handle properties generically where shared.
     const isNewBuild = type === 'new_build';
-    const isQuick = type === 'quick';
+    // const isQuick = type === 'quick'; // Unused
 
-    // Helper to safely access common properties
-    const description = (clientData as any).description;
-    const files = (clientData as any).files || [];
+    const { toast } = useToast();
+    const [isSending, setIsSending] = useState(false);
+    const [isConverting, setIsConverting] = useState(false);
+    const [quotePrice, setQuotePrice] = useState<string>("");
+    const [quoteMessage, setQuoteMessage] = useState<string>("");
 
-    // New Build specific helpers
-    const plotArea = (clientData as any).plotArea;
-    const buildingArea = (clientData as any).buildingArea;
-    const floors = (clientData as any).floors;
-    const hasGarage = (clientData as any).garage;
-    const hasPool = (clientData as any).pool;
+    // Access specs directly
+    const { specs } = budget;
+    const description = specs.description;
+    const files = specs.files || [];
+
+    // Validating specific properties for new build if they exist in specs (custom casting might be needed if ProjectSpecs doesn't have them explicitly yet)
+    const specsAny = specs as any;
+    const plotArea = specsAny.plotArea || 0;
+    const buildingArea = specsAny.buildingArea || specs.totalArea;
+    const floors = specsAny.floors || 1;
+    const hasGarage = specs.parking;
+    const hasPool = specsAny.pool; // Not in ProjectSpecs yet
+
+    const handleSendQuote = async () => {
+        if (!quotePrice || !quoteMessage) {
+            toast({
+                title: "Faltan datos",
+                description: "Por favor, introduce un precio y un mensaje.",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        setIsSending(true);
+        try {
+            const result = await sendQuickQuoteAction({
+                budgetId: budget.id,
+                price: Number(quotePrice),
+                message: quoteMessage
+            });
+
+            if (result.success) {
+                toast({
+                    title: "Presupuesto enviado",
+                    description: "El cliente recibirá la estimación por email.",
+                });
+            } else {
+                toast({
+                    title: "Error",
+                    description: result.error || "No se pudo enviar el presupuesto.",
+                    variant: "destructive"
+                });
+            }
+        } catch (error) {
+            toast({ title: "Error", description: "Fallo inesperado.", variant: "destructive" });
+        } finally {
+            setIsSending(false);
+        }
+    };
+
+    const handleConvertToFull = async () => {
+        setIsConverting(true);
+        try {
+            const result = await convertToFullBudgetAction(budget.id);
+            if (result.success) {
+                toast({
+                    title: "Convertido",
+                    description: "Ahora puedes editar el presupuesto completo.",
+                });
+                // The page should refresh via server action revalidation
+            } else {
+                toast({
+                    title: "Error",
+                    description: result.error || "No se pudo convertir.",
+                    variant: "destructive"
+                });
+            }
+        } catch (error) {
+            toast({ title: "Error", description: "Fallo inesperado.", variant: "destructive" });
+        } finally {
+            setIsConverting(false);
+        }
+    };
 
     return (
         <div className="max-w-5xl mx-auto p-6 space-y-8 animate-in fade-in duration-500">
@@ -42,14 +121,16 @@ export function BudgetRequestViewer({ budget }: BudgetRequestViewerProps) {
                         <span>{format(createdAt, "PPP 'a las' p", { locale: es })}</span>
                     </p>
                 </div>
-                <Badge className="text-base px-4 py-1" variant={budget.status === 'pending_review' ? 'destructive' : 'default'}>
-                    {budget.status === 'pending_review' ? 'Pendiente de Revisión' : budget.status}
-                </Badge>
+                <div className="flex items-center gap-3">
+                    <Badge className="text-base px-4 py-1" variant={budget.status === 'pending_review' ? 'destructive' : 'default'}>
+                        {budget.status === 'pending_review' ? 'Pendiente de Revisión' : budget.status === 'sent' ? 'Enviado' : budget.status}
+                    </Badge>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column: Main Info */}
-                <div className="md:col-span-2 space-y-8">
+                <div className="lg:col-span-2 space-y-8">
                     {/* Project Description */}
                     <Card>
                         <CardHeader>
@@ -117,8 +198,7 @@ export function BudgetRequestViewer({ budget }: BudgetRequestViewerProps) {
                             {files.length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {files.map((file: string, index: number) => {
-                                        // Simple extension check to decide how to render
-                                        // In a real app, storing metadata (mimeType) is better
+                                        // Simple extension check
                                         const isVideo = file.match(/\.(mp4|mov|webm)$/i);
                                         const isPdf = file.match(/\.pdf$/i);
                                         const isImage = !isVideo && !isPdf;
@@ -126,6 +206,7 @@ export function BudgetRequestViewer({ budget }: BudgetRequestViewerProps) {
                                         return (
                                             <div key={index} className="group relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
                                                 {isImage && (
+                                                    // eslint-disable-next-line @next/next/no-img-element
                                                     <img
                                                         src={file}
                                                         alt={`Adjunto ${index + 1}`}
@@ -169,45 +250,117 @@ export function BudgetRequestViewer({ budget }: BudgetRequestViewerProps) {
                     </Card>
                 </div>
 
-                {/* Right Column: Contact Info */}
+                {/* Right Column: Actions / Admin Panel */}
                 <div className="space-y-6">
-                    <Card className="bg-slate-50 border-slate-200 shadow-sm">
-                        <CardHeader>
-                            <CardTitle className="text-lg flex items-center gap-2">
-                                <User className="w-4 h-4" />
+                    {/* Client Info Summary */}
+                    <Card>
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-base flex items-center gap-2">
+                                <User className="w-4 h-4 text-slate-500" />
                                 Datos del Cliente
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <div className="text-sm font-medium text-slate-500">Nombre</div>
-                                <div className="font-semibold text-slate-900">{clientData.name}</div>
-                            </div>
-                            <Separator />
-                            <div>
-                                <div className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                                    <Mail className="w-3 h-3" /> Email
+                        <CardContent className="space-y-3 text-sm">
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold">
+                                    {clientSnapshot.name.charAt(0)}
                                 </div>
-                                <a href={`mailto:${clientData.email}`} className="text-primary hover:underline block truncate">
-                                    {clientData.email}
-                                </a>
-                            </div>
-                            <Separator />
-                            <div>
-                                <div className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                                    <Phone className="w-3 h-3" /> Teléfono
+                                <div>
+                                    <p className="font-medium text-slate-900">{clientSnapshot.name}</p>
+                                    <p className="text-slate-500 text-xs">Registrado el {format(new Date(), 'P', { locale: es })}</p>
                                 </div>
-                                <a href={`tel:${clientData.phone}`} className="text-slate-900 hover:text-primary block">
-                                    {clientData.phone}
-                                </a>
                             </div>
                             <Separator />
-                            <div>
-                                <div className="text-sm font-medium text-slate-500">Dirección del Proyecto</div>
-                                <div className="text-slate-700">{clientData.address}</div>
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <Mail className="w-3.5 h-3.5" />
+                                    <a href={`mailto:${clientSnapshot.email}`} className="hover:text-primary transition-colors">{clientSnapshot.email}</a>
+                                </div>
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <Phone className="w-3.5 h-3.5" />
+                                    <a href={`tel:${clientSnapshot.phone}`} className="hover:text-primary transition-colors">{clientSnapshot.phone}</a>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* ADMIN ACTION PANEL */}
+                    {isAdmin && (
+                        <Card className="border-indigo-100 dark:border-indigo-900 shadow-md">
+                            <CardHeader className="bg-indigo-50/50 dark:bg-indigo-900/10 pb-3">
+                                <CardTitle className="text-base flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
+                                    <Send className="w-4 h-4" />
+                                    Respuesta Rápida
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-4 space-y-4">
+                                {budget.quickQuote ? (
+                                    <div className="bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30 rounded-lg p-4 space-y-2">
+                                        <div className="flex items-center gap-2 text-green-700 font-semibold">
+                                            <CheckCircle2 className="w-4 h-4" />
+                                            Presupuesto Enviado
+                                        </div>
+                                        <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                                            {budget.quickQuote.price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                                        </div>
+                                        <div className="text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-black/20 p-2 rounded border border-green-200/50">
+                                            &quot;{budget.quickQuote.message}&quot;
+                                        </div>
+                                        <div className="text-xs text-slate-400 text-right">
+                                            Enviado el {format(new Date(budget.quickQuote.answeredAt), 'PPP p', { locale: es })}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Precio Estimado (€)</label>
+                                            <Input
+                                                type="number"
+                                                placeholder="Ej: 15000"
+                                                value={quotePrice}
+                                                onChange={(e) => setQuotePrice(e.target.value)}
+                                                className="font-mono text-lg"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mensaje al Cliente</label>
+                                            <Textarea
+                                                placeholder="Hola, basándome en los m2 y calidades..."
+                                                value={quoteMessage}
+                                                onChange={(e) => setQuoteMessage(e.target.value)}
+                                                rows={4}
+                                            />
+                                        </div>
+                                        <Button
+                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                                            onClick={handleSendQuote}
+                                            disabled={isSending}
+                                        >
+                                            {isSending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+                                            Enviar Estimación
+                                        </Button>
+                                    </>
+                                )}
+
+                                <Separator className="my-2" />
+
+                                <div className="pt-2">
+                                    <p className="text-xs text-slate-500 mb-3">
+                                        Si el proyecto requiere un desglose detallado, conviértelo a formato completo.
+                                    </p>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-400"
+                                        onClick={handleConvertToFull}
+                                        disabled={isConverting}
+                                    >
+                                        {isConverting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <FileCode className="w-4 h-4 mr-2" />}
+                                        Convertir a Presupuesto Completo
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             </div>
         </div>

@@ -111,57 +111,37 @@ export class FirestorePriceBookRepository implements PriceBookRepository {
         return [];
     }
 
-    async searchByVector(embedding: number[], limit: number = 10, year?: number): Promise<PriceBookItem[]> {
+    async searchByVector(embedding: number[], limit: number = 10, year?: number, keywordFilter?: string): Promise<(PriceBookItem & { matchScore: number })[]> {
         const collectionRef = this.db.collection('price_book_items');
 
-        // Use Firestore Vector Search (findNearest)
-        // Wrappping the raw array in FieldValue.vector() is often safer/required depending on SDK version internals
         const vectorValue = FieldValue.vector(embedding);
 
-        console.log(`[FirestoreRepository] Searching with vector (first 3): [${embedding.slice(0, 3).join(', ')}]...`);
-        console.log(`[FirestoreRepository] Vector dimensions: ${embedding.length}`);
-
-        // Check for NaN
-        if (embedding.some(isNaN)) {
-            console.error("[FirestoreRepository] Error: Embedding contains NaN values!");
-            return [];
-        }
+        // Hybrid Strategy: Fetch more candidates via Vector Search (Loose Net), then Re-rank via Keyword
+        const candidateLimit = keywordFilter ? limit * 3 : limit;
 
         let vectorQuery = collectionRef.findNearest('embedding', vectorValue, {
-            limit: limit,
-            distanceMeasure: 'COSINE',  // Reverting to COSINE as index was created with it standardly
+            limit: candidateLimit,
+            distanceMeasure: 'COSINE',
         });
 
-        // Apply pre-filter if defined (Must match Vector Index configuration!)
-        // IMPORTANT: Firestore Vector Search only supports pre-filters if you configured the index with them.
-        // For simplicity in this iteration, we don't assume a strict composite index with "year".
-        // If "year" is passed, we might need to filter manually AFTER or assume index exists.
-        // Google recommends creating specific indexes. For now, let's try WITHOUT pre-filter or trust the user created a specific one if we add it.
-        // The prompt asked for "Collection: price_book_items, Field: embedding". It didn't mention 'year' partition.
-        // So we will search globally and then filter in memory? No, that ruins result quality (top K might be wrong year).
-        // Best approach for now: Search globally (or rely on index configuration)
-        // If we want to filter by year, we need: "vector-config": { "dimension": 768, "flat": {} } AND "fields": [{"fieldPath": "year"}]
-
-        // For this first iteration, let's just run the vector search.
-        // If year is critical, we should add `.where('year', '==', year)` before findNearest, 
-        // BUT that requires a Composite Vector Index.
-
-        if (year) {
-            // Try to chain where if supported or fallback to memory filter (bad for TopK)
-            // We will attempt to chain it. If index missing, it will throw an error link.
-            // vectorQuery = collectionRef.where('year', '==', year).findNearest(...) // This is the syntax
-            // But Typescript might complain depending on SDK version definitions.
-            // Let's stick to simple Global Search for the MVP "Tester" as requested.
-        }
+        // if (year) { ... } // Complicated in Firestore with Vector currently without composite index. Ignoring for now.
 
         const snapshot = await vectorQuery.get();
-        console.log(`[FirestoreRepository] Vector search found ${snapshot.size} documents.`);
 
-        return snapshot.docs.map(doc => {
+        let candidates = snapshot.docs.map(doc => {
             const data = doc.data();
-            const { embedding, createdAt, ...rest } = data;
+            const storedEmbeddingVector = data.embedding;
+            let matchScore = 0;
 
-            // Serialize Date/Timestamp
+            if (storedEmbeddingVector) {
+                const vec = Array.isArray(storedEmbeddingVector) ? storedEmbeddingVector : (storedEmbeddingVector.toArray ? storedEmbeddingVector.toArray() : null);
+                if (vec) {
+                    matchScore = this.cosineSimilarity(embedding, vec);
+                }
+            }
+
+            const { embedding: _, createdAt, ...rest } = data;
+
             let createdDate: Date | undefined;
             if (createdAt && typeof createdAt.toDate === 'function') {
                 createdDate = createdAt.toDate();
@@ -173,37 +153,63 @@ export class FirestorePriceBookRepository implements PriceBookRepository {
 
             return {
                 id: doc.id,
-                createdAt: createdDate, // Next.js handles Date objects if they are "true" Date objects
+                createdAt: createdDate,
+                matchScore: matchScore,
                 ...rest
-            } as PriceBookItem;
+            } as PriceBookItem & { matchScore: number };
         });
+
+        // Hybrid Re-ranking
+        if (keywordFilter && keywordFilter.trim().length > 0) {
+            const keywords = keywordFilter.toLowerCase().split(/\s+/).filter(k => k.length > 2); // Ignore small words
+
+            candidates = candidates.map(candidate => {
+                const text = (candidate.description || "").toLowerCase();
+                let keywordScore = 0;
+                let matches = 0;
+
+                keywords.forEach(kw => {
+                    if (text.includes(kw)) {
+                        matches++;
+                        // Bonus for exact word match vs substring? 
+                        // Simple inclusion is fine for now.
+                    }
+                });
+
+                if (keywords.length > 0) {
+                    keywordScore = matches / keywords.length; // 0 to 1
+                }
+
+                // Weighted Score: Vector (Semantic) + Keyword (Exactness)
+                // We want to boost items that match keywords but still respect vector similarity
+                // New Score = Vector * (1 + 0.5 * KeywordScore)
+                return {
+                    ...candidate,
+                    matchScore: candidate.matchScore * (1 + 0.5 * keywordScore)
+                };
+            });
+        }
+
+        // Final Sort and Limit
+        return candidates
+            .sort((a, b) => b.matchScore - a.matchScore)
+            .slice(0, limit);
     }
 
     async searchByVectorWithFilters(
         embedding: number[],
         filters: import('../domain/price-book-repository').SearchFilters,
         limit: number = 10
-    ): Promise<PriceBookItem[]> {
+    ): Promise<(PriceBookItem & { matchScore: number })[]> {
         const collectionRef = this.db.collection('price_book_items');
 
         let queryRef: any = collectionRef;
 
-        // Apply Structured Filters BEFORE Vector Search (Hybrid)
-        if (filters.chapter) {
-            queryRef = queryRef.where('chapter', '==', filters.chapter);
-        }
-        if (filters.section) {
-            queryRef = queryRef.where('section', '==', filters.section);
-        }
-        if (filters.year) {
-            queryRef = queryRef.where('year', '==', filters.year);
-        }
-        if (filters.maxPrice) {
-            queryRef = queryRef.where('priceTotal', '<=', filters.maxPrice);
-        }
+        if (filters.chapter) queryRef = queryRef.where('chapter', '==', filters.chapter);
+        if (filters.section) queryRef = queryRef.where('section', '==', filters.section);
+        if (filters.year) queryRef = queryRef.where('year', '==', filters.year);
+        if (filters.maxPrice) queryRef = queryRef.where('priceTotal', '<=', filters.maxPrice);
 
-        // Apply Vector Search on the filtered query
-        // This requires a Firestore Composite Index (Vector + Fields)
         const vectorValue = FieldValue.vector(embedding);
 
         const vectorQuery = queryRef.findNearest('embedding', vectorValue, {
@@ -216,11 +222,35 @@ export class FirestorePriceBookRepository implements PriceBookRepository {
         const snapshot = await vectorQuery.get();
         return snapshot.docs.map((doc: any) => {
             const data = doc.data();
-            const { embedding, createdAt, ...rest } = data;
+
+            const storedEmbeddingVector = data.embedding;
+            let matchScore = 0;
+            if (storedEmbeddingVector) {
+                const vec = Array.isArray(storedEmbeddingVector) ? storedEmbeddingVector : (storedEmbeddingVector.toArray ? storedEmbeddingVector.toArray() : null);
+                if (vec) {
+                    matchScore = this.cosineSimilarity(embedding, vec);
+                }
+            }
+
+            const { embedding: _, createdAt, ...rest } = data;
             return {
                 id: doc.id,
+                matchScore,
                 ...rest
-            } as PriceBookItem;
-        });
+            } as PriceBookItem & { matchScore: number };
+        }).sort((a: PriceBookItem & { matchScore: number }, b: PriceBookItem & { matchScore: number }) => b.matchScore - a.matchScore);
+    }
+
+    private cosineSimilarity(vecA: number[], vecB: number[]): number {
+        if (vecA.length !== vecB.length) return 0;
+        let dotProduct = 0;
+        let normA = 0;
+        let normB = 0;
+        for (let i = 0; i < vecA.length; i++) {
+            dotProduct += vecA[i] * vecB[i];
+            normA += vecA[i] * vecA[i];
+            normB += vecB[i] * vecB[i];
+        }
+        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
 }

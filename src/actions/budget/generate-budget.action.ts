@@ -45,11 +45,11 @@ export async function generateBudgetAction(leadId: string, formValues: DetailedF
             version: 1,
             type: specs.interventionType === 'new_build' ? 'new_build' : 'renovation',
 
-            lineItems: budgetResult.lineItems.map((item: any) => ({
-                ...item,
-                id: uuidv4(),
-                isEditing: false
-            })),
+            chapters: budgetResult.chapters?.map((c: any) => ({
+                ...c,
+                id: c.id || uuidv4(),
+                items: c.items.map((i: any) => ({ ...i, id: uuidv4(), type: 'PARTIDA' })) // Ensure IDs and type
+            })) || [],
             costBreakdown: budgetResult.costBreakdown || {
                 materialExecutionPrice: 0,
                 overheadExpenses: 0,

@@ -8,19 +8,25 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 
 // Initial Cost Breakdown Calculator
 const calculateBreakdown = (items: EditableBudgetLineItem[]): BudgetCostBreakdown => {
-    const materialExecutionPrice = items.reduce((sum, item) => sum + (item.item?.totalPrice || 0), 0);
+    const materialExecutionPrice = items.reduce((sum, item) => {
+        const price = parseFloat(String(item.item?.totalPrice || 0));
+        return sum + (isNaN(price) ? 0 : price);
+    }, 0);
     const overheadExpenses = materialExecutionPrice * 0.13; // 13% General Expenses
     const industrialBenefit = materialExecutionPrice * 0.06; // 6% Industrial Benefit
     const subtotal = materialExecutionPrice + overheadExpenses + industrialBenefit;
     const tax = subtotal * 0.21; // 21% IVA
 
+    // Round to 2 decimals
+    const round = (num: number) => Math.round((num + Number.EPSILON) * 100) / 100;
+
     return {
-        materialExecutionPrice,
-        overheadExpenses,
-        industrialBenefit,
-        tax,
+        materialExecutionPrice: round(materialExecutionPrice),
+        overheadExpenses: round(overheadExpenses),
+        industrialBenefit: round(industrialBenefit),
+        tax: round(tax),
         globalAdjustment: 0,
-        total: subtotal + tax
+        total: round(subtotal + tax)
     };
 };
 
@@ -44,6 +50,7 @@ const initialState: BudgetEditorState = {
 function budgetEditorReducer(state: BudgetEditorState, action: BudgetEditorAction): BudgetEditorState {
     switch (action.type) {
         case 'SET_ITEMS': {
+            console.log('[BudgetEditor] SET_ITEMS triggered with', action.payload.length, 'items');
             // Extract unique chapters or default to 'General'
             const newItems = action.payload.map(item => ({
                 ...item,
@@ -51,9 +58,10 @@ function budgetEditorReducer(state: BudgetEditorState, action: BudgetEditorActio
                 isEditing: false,
                 isDirty: false,
                 chapter: item.chapter || 'General', // Default chapter
+                order: item.order || 0, // Ensure order exists
                 originalState: item.originalState || (item.item ? {
-                    unitPrice: item.item.unitPrice || 0,
-                    quantity: item.item.quantity || 0,
+                    unitPrice: Number(item.item.unitPrice || 0),
+                    quantity: Number(item.item.quantity || 0),
                     description: item.item.description || '',
                     unit: item.item.unit || ''
                 } : undefined) // Snapshot with strict defaults
@@ -85,24 +93,26 @@ function budgetEditorReducer(state: BudgetEditorState, action: BudgetEditorActio
             const chapterToRemove = action.payload;
             const newChapters = state.chapters.filter(c => c !== chapterToRemove);
 
-            // Move items to 'General' or the first available chapter
-            const targetChapter = newChapters.length > 0 ? newChapters[0] : 'General';
-
-            const newItems = state.items.map(item =>
-                item.chapter === chapterToRemove
-                    ? { ...item, chapter: targetChapter, isDirty: true }
-                    : item
-            );
+            // DELETE items in that chapter (User intent: remove cost)
+            const newItems = state.items.filter(item => item.chapter !== chapterToRemove);
 
             // Ensure we have at least 'General' if all chapters removed
             if (newChapters.length === 0 && !newChapters.includes('General')) {
                 newChapters.push('General');
             }
 
+            const breakdown = calculateBreakdown(newItems);
+
+            const newHistory = state.history.slice(0, state.historyIndex + 1);
+            newHistory.push({ items: newItems, timestamp: Date.now() });
+
             return {
                 ...state,
                 items: newItems,
                 chapters: newChapters,
+                costBreakdown: breakdown,
+                history: newHistory,
+                historyIndex: newHistory.length - 1,
                 hasUnsavedChanges: true
             };
         }
@@ -356,12 +366,24 @@ function budgetEditorReducer(state: BudgetEditorState, action: BudgetEditorActio
 export function useBudgetEditor(initialItems: BudgetLineItem[] = []) {
     const [state, dispatch] = useReducer(budgetEditorReducer, initialState);
 
-    // Initialize items
+    // Initialize items or Update if server data changes (e.g. Regeneration)
     useEffect(() => {
-        if (initialItems.length > 0 && state.items.length === 0) {
-            dispatch({ type: 'SET_ITEMS', payload: initialItems as EditableBudgetLineItem[] });
+        if (initialItems.length > 0) {
+            // Check if we really need to update to avoid infinite loops or overwriting unsaved work
+            // If user has unsaved changes, we might NOT want to overwrite? 
+            // BUT for "Regenerate", we usually want to force it.
+            // Let's assume if initialItems count changes significantly or IDs differ, we update.
+            // Simple check: If state is empty OR items differ in length/IDs and we don't have unsaved changes.
+
+            const currentIds = new Set(state.items.map(i => i.id));
+            const hasNewData = initialItems.some(i => !currentIds.has(i.id || ''));
+
+            if (state.items.length === 0 || (hasNewData && !state.hasUnsavedChanges)) {
+                console.log('[useBudgetEditor] Syncing state with new initialItems:', initialItems.length);
+                dispatch({ type: 'SET_ITEMS', payload: initialItems as EditableBudgetLineItem[] });
+            }
         }
-    }, [initialItems]);
+    }, [initialItems, state.items.length, state.hasUnsavedChanges]);
 
     // Prevent accidental exit with unsaved changes
     useEffect(() => {

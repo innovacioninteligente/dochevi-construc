@@ -171,7 +171,7 @@ export function BudgetConfigForm({ initialConfig }: BudgetConfigFormProps) {
                                             <Input type="number" step="10" {...field} />
                                         </FormControl>
                                         <FormDescription>
-                                            Precio de referencia para estimaciones rápidas de "paquete completo" (ej: 650€/m²).
+                                            Precio de referencia para estimaciones rápidas de &quot;paquete completo&quot; (ej: 650€/m²).
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>

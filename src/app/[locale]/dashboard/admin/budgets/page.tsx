@@ -26,8 +26,11 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Input } from '@/components/ui/input';
+import { BudgetApproveButton } from '@/components/budget/budget-approve-button';
+import { BudgetsTable } from '@/components/budget/admin/BudgetsTable';
 
-export default async function BudgetsListPage() {
+export default async function BudgetsListPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const budgets = await getAllBudgetsAction();
 
     // Helper to get source icon and label
@@ -118,7 +121,24 @@ export default async function BudgetsListPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                            --%
+                            {(() => {
+                                const now = new Date();
+                                const currentMonth = now.getMonth();
+                                const currentYear = now.getFullYear();
+
+                                const thisMonthBudgets = budgets.filter(b => {
+                                    const d = new Date(b.createdAt);
+                                    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+                                });
+
+                                // Consider conversion as Approved vs Total (excluding drafts that are just started)
+                                // Or simple Approved / Total Created this month
+                                const total = thisMonthBudgets.filter(b => b.status !== 'draft').length;
+                                const approved = thisMonthBudgets.filter(b => b.status === 'approved').length;
+
+                                if (total === 0) return '0%';
+                                return `${Math.round((approved / total) * 100)}%`;
+                            })()}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">Conversión mensual</p>
                     </CardContent>
@@ -127,129 +147,8 @@ export default async function BudgetsListPage() {
 
             {/* Main Table Card */}
             <Card className="border-0 shadow-xl shadow-zinc-200/40 dark:shadow-zinc-950/40 overflow-hidden bg-white/80 dark:bg-zinc-900/60 backdrop-blur-xl ring-1 ring-zinc-200 dark:ring-zinc-800">
-                <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-4 bg-zinc-50/50 dark:bg-zinc-900/20">
-                    <div className="relative flex-1 max-w-sm group">
-                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <Input
-                            type="search"
-                            placeholder="Buscar cliente, referencia..."
-                            className="pl-9 bg-white dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-primary/20 transition-all rounded-xl"
-                        />
-                    </div>
-                </div>
-
-                <div className="relative overflow-x-auto">
-                    <Table>
-                        <TableHeader className="bg-zinc-50/80 dark:bg-zinc-900/40 backdrop-blur-sm">
-                            <TableRow className="hover:bg-transparent border-zinc-100 dark:border-zinc-800">
-                                <TableHead className="w-[180px] font-semibold text-zinc-900 dark:text-zinc-100">Ref. & Fecha</TableHead>
-                                <TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">Cliente</TableHead>
-                                <TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">Origen</TableHead>
-                                <TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">Proyecto</TableHead>
-                                <TableHead className="font-semibold text-zinc-900 dark:text-zinc-100">Estado</TableHead>
-                                <TableHead className="text-right font-semibold text-zinc-900 dark:text-zinc-100">Importe</TableHead>
-                                <TableHead className="w-[50px]"></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {budgets.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={7} className="h-48 text-center">
-                                        <div className="flex flex-col items-center justify-center text-muted-foreground">
-                                            <div className="h-16 w-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
-                                                <Folder className="h-8 w-8 opacity-50" />
-                                            </div>
-                                            <p className="text-lg font-medium text-foreground">No hay presupuestos</p>
-                                            <p className="text-sm">Genere uno nuevo para comenzar.</p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                budgets.map((budget) => {
-                                    const sourceInfo = getSourceInfo(budget.source);
-                                    const SourceIcon = sourceInfo.icon;
-
-                                    return (
-                                        <TableRow key={budget.id} className="group hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-all border-zinc-50 dark:border-zinc-800/40">
-                                            <TableCell>
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="font-mono text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded w-fit group-hover:bg-white dark:group-hover:bg-zinc-700 transition-colors">
-                                                        #{budget.id.substring(0, 8).toUpperCase()}
-                                                    </span>
-                                                    <div className="flex items-center text-xs text-muted-foreground">
-                                                        <Calendar className="mr-1.5 h-3 w-3" />
-                                                        {format(budget.createdAt, "d MMM yyyy", { locale: es })}
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-
-                                            <TableCell>
-                                                <div className="flex flex-col">
-                                                    <span className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{budget.clientData.name}</span>
-                                                    <span className="text-xs text-muted-foreground">{budget.clientData.email || 'Sin contacto'}</span>
-                                                </div>
-                                            </TableCell>
-
-                                            <TableCell>
-                                                <Badge variant="outline" className={`gap-1.5 py-1 px-2.5 font-medium border shadow-sm ${sourceInfo.color}`}>
-                                                    <SourceIcon className="h-3.5 w-3.5" />
-                                                    {sourceInfo.label}
-                                                </Badge>
-                                            </TableCell>
-
-                                            <TableCell>
-                                                <div className="flex flex-col gap-2 max-w-[200px]">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 border-zinc-200 dark:border-zinc-700 font-bold tracking-wider bg-white dark:bg-zinc-800">
-                                                            {budget.type === 'quick' ? 'RÁPIDO' :
-                                                                budget.type === 'new_build' ? 'OBRA NUEVA' : 'REFORMA'}
-                                                        </Badge>
-                                                    </div>
-                                                    <span className="text-xs text-muted-foreground truncate font-medium" title={(budget.clientData as any).description}>
-                                                        {(budget.clientData as any).description || '—'}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
-
-                                            <TableCell>
-                                                <Badge
-                                                    className={
-                                                        budget.status === 'approved' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 shadow-md' :
-                                                            budget.status === 'sent' ? 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/20 shadow-md' :
-                                                                budget.status === 'pending_review' ? 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/20 shadow-md' :
-                                                                    'bg-zinc-500 hover:bg-zinc-600'
-                                                    }
-                                                >
-                                                    {budget.status === 'pending_review' ? 'Pendiente' :
-                                                        budget.status === 'approved' ? 'Aprobado' :
-                                                            budget.status === 'draft' ? 'Borrador' :
-                                                                budget.status}
-                                                </Badge>
-                                            </TableCell>
-
-                                            <TableCell className="text-right">
-                                                <div className="font-mono font-bold text-foreground text-base">
-                                                    {budget.totalEstimated.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
-                                                </div>
-                                                <div className="text-[10px] uppercase text-muted-foreground font-medium tracking-wide">
-                                                    IVA incluido
-                                                </div>
-                                            </TableCell>
-
-                                            <TableCell>
-                                                <Link href={`/dashboard/admin/budgets/${budget.id}/edit`}>
-                                                    <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-all hover:scale-105">
-                                                        <ArrowRight className="h-5 w-5" />
-                                                        <span className="sr-only">Ver detalle</span>
-                                                    </Button>
-                                                </Link>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })
-                            )}
-                        </TableBody>
-                    </Table>
+                <div className="p-4">
+                    <BudgetsTable budgets={budgets} locale={locale} />
                 </div>
             </Card>
         </div>

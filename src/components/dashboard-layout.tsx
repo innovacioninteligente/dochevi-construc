@@ -3,6 +3,8 @@
 import React from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter, usePathname } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
+import { useWidgetContext } from '@/context/budget-widget-context';
 
 import { ModernSidebar } from '@/components/layout/modern-sidebar';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -13,12 +15,38 @@ export function DashboardLayout({ children, t }: { children: React.ReactNode, t:
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
+  // Auto-close mobile menu on route change
+  React.useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Determine if the current page should be full-width/app-like (no default padding)
+  const isAppPage = pathname.includes('/admin/messages') ||
+    pathname.includes('/wizard') ||
+    pathname.includes('/projects') ||
+    pathname.includes('/budgets') ||
+    pathname.includes('/presupuesto');
+
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   React.useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  // SYNC AUTH USER WITH WIDGET CONTEXT (CRITICAL FOR CHAT)
+  const { setLeadId } = useWidgetContext();
+  React.useEffect(() => {
+    if (user) {
+      setLeadId(user.uid);
+    }
+  }, [user, setLeadId]);
 
   if (loading || !user) {
     return (
@@ -43,25 +71,34 @@ export function DashboardLayout({ children, t }: { children: React.ReactNode, t:
         {/* Mobile Header */}
         <div className="md:hidden flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex items-center gap-2">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="-ml-2">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Toggle Menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-72 border-r-0">
-                <SheetTitle className="sr-only">Menú de Navegación</SheetTitle>
-                <ModernSidebar t={t} className="w-full h-full border-none" />
-              </SheetContent>
-            </Sheet>
+            {mounted ? (
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="-ml-2">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Toggle Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-72 border-r-0">
+                  <SheetTitle className="sr-only">Menú de Navegación</SheetTitle>
+                  <ModernSidebar t={t} className="w-full h-full border-none" />
+                </SheetContent>
+              </Sheet>
+            ) : (
+              <Button variant="ghost" size="icon" className="-ml-2">
+                <Menu className="h-6 w-6" />
+              </Button>
+            )}
             <span className="font-semibold text-lg">GRUPO RG</span>
           </div>
           {/* We could add user menu or other actions here for mobile */}
         </div>
 
         {/* Children Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 p-4 md:p-8 lg:p-10">
+        <div className={cn(
+          "flex-1 min-h-0",
+          isAppPage ? "overflow-hidden p-0" : "overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 p-4 md:p-8 lg:p-10"
+        )}>
           {children}
         </div>
       </main>

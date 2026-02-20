@@ -30,7 +30,7 @@ export class InitializeBudget {
             version: 1,
             type: specs.interventionType === 'new_build' ? 'new_build' : 'renovation',
             specs: specs,
-            lineItems: [], // Fresh budget
+            chapters: [], // Fresh budget
             costBreakdown: {
                 materialExecutionPrice: 0,
                 overheadExpenses: 0,

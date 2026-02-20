@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { clientRequirementsFlow } from '@/backend/ai/flows/client-requirements.flow';
 import { generateBudgetFlow } from '@/backend/ai/flows/budget/generate-budget.flow';
-import { buildBudgetNarrative } from '@/backend/budget/domain/budget-narrative-builder';
+import { BudgetNarrativeBuilder } from '@/backend/budget/domain/budget-narrative-builder';
 import { DetailedFormValues } from '@/components/budget-request/schema';
 
 /**
@@ -33,7 +33,35 @@ export async function POST(request: NextRequest) {
 
         } else if (action === 'generate') {
             // Generate budget
-            const narrative = buildBudgetNarrative(requirements as DetailedFormValues);
+            const req = requirements as DetailedFormValues;
+
+            // Infer generic quality from first bathroom or kitchen, default to medium
+            let quality: 'basic' | 'medium' | 'premium' | 'luxury' = 'medium';
+            if (req.bathrooms?.length && req.bathrooms[0].quality) quality = req.bathrooms[0].quality;
+            else if (req.kitchen?.quality) quality = req.kitchen.quality;
+
+            // Map DetailedFormValues to ProjectSpecs
+            const specs: any = {
+                interventionType: req.projectScope === 'integral' ? 'total' : 'partial',
+                propertyType: req.propertyType,
+                totalArea: req.totalAreaM2,
+                qualityLevel: quality,
+                // Rooms only if we have details, otherwise we might just have count which this builder might not accept alone yet
+                // But we can map bathrooms
+                bathrooms: req.bathrooms?.map((b: any) => ({
+                    area: b.floorM2 || 4, // default estimation if missing
+                    quality: b.quality || quality
+                })),
+                kitchens: req.kitchen ? [{
+                    area: req.kitchen.floorM2 || 10,
+                    quality: req.kitchen.quality || quality
+                }] : [],
+                demolition: req.demolishPartitions,
+                elevator: req.hasElevator,
+                parking: false
+            };
+
+            const narrative = BudgetNarrativeBuilder.build(specs);
             const result = await generateBudgetFlow({ userRequest: narrative });
 
             return NextResponse.json(result);

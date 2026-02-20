@@ -3,13 +3,19 @@
  * 
  * Takes extracted measurement items and finds matching prices using vector search.
  * Calculates totals and generates a priced budget.
+ * 
+ * New Features:
+ * - Batched Processing (Promise.all)
+ * - Unified Catalog Search (PriceBook + Materials)
+ * - Smart Fallback (Materials + Estimated Labor)
  */
 
 import { ai } from '@/backend/ai/config/genkit.config';
 import { z } from 'zod';
-import { MeasurementItem, MeasurementItemSchema, measurementExtractionFlow } from './measurement-extraction.flow';
-import { RestApiVectorizerAdapter } from '@/backend/price-book/infrastructure/ai/rest-api-vectorizer.adapter';
-import { FirestorePriceBookRepository } from '@/backend/price-book/infrastructure/firestore-price-book-repository';
+import { MeasurementItemSchema, measurementExtractionFlow } from './measurement-extraction.flow';
+import { CatalogSearchService } from '@/backend/catalog/application/catalog-search.service';
+import { UnifiedCatalogItem } from '@/backend/catalog/domain/catalog-item';
+import { DEFAULT_BUDGET_CONFIG } from '@/backend/budget/domain/budget-config';
 
 // Schema for priced items
 export const PricedMeasurementItemSchema = MeasurementItemSchema.extend({
@@ -18,6 +24,8 @@ export const PricedMeasurementItemSchema = MeasurementItemSchema.extend({
     priceBookCode: z.string().optional().describe('Matched Price Book item code'),
     matchConfidence: z.number().min(0).max(100).describe('Confidence of the match (0-100)'),
     isEstimate: z.boolean().describe('Whether price is an AI estimate vs matched'),
+    matchType: z.enum(['LABOR', 'MATERIAL', 'ESTIMATE']).optional().describe('Type of match found'),
+    matchName: z.string().optional().describe('Name of the matched item'),
     // Ensure these are explicitly carried over
     page: z.number().optional(),
     chapter: z.string().optional(),
@@ -29,6 +37,7 @@ export type PricedMeasurementItem = z.infer<typeof PricedMeasurementItemSchema>;
 const PricingOutputSchema = z.object({
     projectName: z.string().optional(),
     clientName: z.string().optional(),
+    projectType: z.string().optional().describe('Detected project type (e.g., Reform, New Build)'),
     items: z.array(PricedMeasurementItemSchema),
     summary: z.object({
         totalItems: z.number(),
@@ -45,42 +54,88 @@ const PricingOutputSchema = z.object({
 
 export type PricingOutput = z.infer<typeof PricingOutputSchema>;
 
+const catalogService = new CatalogSearchService();
 
-const vectorizer = new RestApiVectorizerAdapter();
-const priceBookRepo = new FirestorePriceBookRepository();
+// Batch size for concurrent processing
+const BATCH_SIZE = 5;
 
-async function findBestMatch(description: string): Promise<{
-    unitPrice: number;
-    priceBookCode: string;
-    confidence: number;
-    isEstimate: boolean;
-} | null> {
-    try {
-        // Generate embedding for the description
-        const embedding = await vectorizer.embedText(description);
+/**
+ * Heuristic to detect project type based on items
+ */
+function detectProjectType(items: any[]): string {
+    const text = items.map(i => i.description).join(' ').toLowerCase();
+    if (text.includes('demolicion') || text.includes('retirada')) return 'Reforma Integral';
+    if (text.includes('cimentacion') || text.includes('estructura')) return 'Obra Nueva';
+    if (text.includes('baño') || text.includes('sanitario')) return 'Reforma Baño';
+    if (text.includes('cocina')) return 'Reforma Cocina';
+    return 'Obra General';
+}
 
-        // Search price book
-        const results = await priceBookRepo.searchByVector(embedding, 3);
+async function processBatch(items: any[]): Promise<PricedMeasurementItem[]> {
+    const promises = items.map(async (item) => {
+        try {
+            // 1. Search in Unified Catalog
+            const results = await catalogService.search(item.description, 3); // 3 per source
 
-        if (results.length > 0) {
-            const best = results[0];
-            // Calculate confidence based on semantic similarity (simplified)
-            // In production, you'd compare embeddings properly
-            const confidence = 85; // Placeholder - would be actual similarity score
+            // 2. Select Best Match
+            let bestMatch: UnifiedCatalogItem | null = null;
+            let matchType: 'LABOR' | 'MATERIAL' | 'ESTIMATE' = 'ESTIMATE';
+            let finalPrice = 0;
+            let confidence = 0;
+
+            // Priority 1: Labor/Partida match (High Confidence)
+            const laborMatch = results.find(r => r.type === 'LABOR');
+            // Priority 2: Material match
+            const materialMatch = results.find(r => r.type === 'MATERIAL');
+
+            if (laborMatch) {
+                bestMatch = laborMatch;
+                matchType = 'LABOR';
+                finalPrice = laborMatch.price;
+                confidence = 85;
+            } else if (materialMatch) {
+                bestMatch = materialMatch;
+                matchType = 'MATERIAL';
+                // Material Price + 40% Installation Estimate
+                finalPrice = materialMatch.price * 1.4;
+                confidence = 60; // Lower confidence because labor is estimated
+            } else {
+                // Fallback
+                matchType = 'ESTIMATE';
+                finalPrice = estimateFallbackPrice(item);
+                confidence = 30;
+            }
 
             return {
-                unitPrice: best.priceTotal,
-                priceBookCode: best.code,
-                confidence,
-                isEstimate: false,
+                ...item,
+                unitPrice: finalPrice,
+                totalPrice: finalPrice * item.quantity,
+                priceBookCode: bestMatch?.code,
+                matchConfidence: confidence,
+                isEstimate: matchType === 'ESTIMATE',
+                matchType: matchType,
+                matchName: bestMatch?.name,
+                page: item.page,
+                chapter: item.chapter,
+                section: item.section,
+            };
+
+        } catch (error) {
+            console.error(`Error pricing item ${item.description}:`, error);
+            // Return fallback on error
+            const fallback = estimateFallbackPrice(item);
+            return {
+                ...item,
+                unitPrice: fallback,
+                totalPrice: fallback * item.quantity,
+                isEstimate: true,
+                matchType: 'ESTIMATE',
+                matchConfidence: 0
             };
         }
+    });
 
-        return null;
-    } catch (error) {
-        console.error('[MeasurementPricing] Error finding match:', error);
-        return null;
-    }
+    return Promise.all(promises);
 }
 
 export const measurementPricingFlow = ai.defineFlow(
@@ -93,57 +148,38 @@ export const measurementPricingFlow = ai.defineFlow(
         outputSchema: PricingOutputSchema,
     },
     async ({ pdfBase64, mimeType }) => {
-        console.log('[MeasurementPricing] Starting full pipeline...');
+        console.log('[MeasurementPricing] Starting Batched Hybrid Pipeline...');
 
         // Step 1: Extract measurements
         const extraction = await measurementExtractionFlow({ pdfBase64, mimeType });
-        console.log(`[MeasurementPricing] Extracted ${extraction.items.length} items`);
+        console.log(`[MeasurementPricing] Extracted ${extraction.items.length} items. Processing in batches of ${BATCH_SIZE}...`);
 
-        // Step 2: Price each item using vector search
+        const projectType = detectProjectType(extraction.items);
+        console.log(`[MeasurementPricing] Detected Project Type: ${projectType}`);
+
+        // Step 2: Batched Pricing
         const pricedItems: PricedMeasurementItem[] = [];
-        let matchedCount = 0;
 
-        for (const item of extraction.items) {
-            const match = await findBestMatch(item.description);
-
-            if (match) {
-                matchedCount++;
-                pricedItems.push({
-                    ...item,
-                    unitPrice: match.unitPrice,
-                    totalPrice: match.unitPrice * item.quantity,
-                    priceBookCode: match.priceBookCode,
-                    matchConfidence: match.confidence,
-                    isEstimate: false,
-                    // Pass through context fields
-                    page: item.page,
-                    chapter: item.chapter,
-                    section: item.section,
-                });
-            } else {
-                // Fallback: estimate price based on unit and description length
-                const estimatedPrice = estimateFallbackPrice(item);
-                pricedItems.push({
-                    ...item,
-                    unitPrice: estimatedPrice,
-                    totalPrice: estimatedPrice * item.quantity,
-                    priceBookCode: undefined,
-                    matchConfidence: 30, // Low confidence for estimates
-                    isEstimate: true,
-                    // Pass through context fields
-                    page: item.page,
-                    chapter: item.chapter,
-                    section: item.section,
-                });
-            }
+        for (let i = 0; i < extraction.items.length; i += BATCH_SIZE) {
+            const batch = extraction.items.slice(i, i + BATCH_SIZE);
+            console.log(`[MeasurementPricing] Processing batch ${i / BATCH_SIZE + 1}...`);
+            const processedBatch = await processBatch(batch);
+            pricedItems.push(...processedBatch);
         }
 
+        const matchedCount = pricedItems.filter(i => !i.isEstimate).length;
+
         // Step 3: Calculate summary
+        // Use Default Config (In future, fetch strict config from DB)
+        const config = DEFAULT_BUDGET_CONFIG;
+
         const subtotal = pricedItems.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
-        const overheadExpenses = subtotal * 0.13;
-        const industrialBenefit = subtotal * 0.06;
+
+        // Apply margins
+        const overheadExpenses = subtotal * config.overheadExpenses;
+        const industrialBenefit = subtotal * config.industrialBenefit;
         const pemConGG = subtotal + overheadExpenses + industrialBenefit;
-        const iva = pemConGG * 0.21;
+        const iva = pemConGG * config.iva;
         const total = pemConGG + iva;
 
         console.log(`[MeasurementPricing] Complete. ${matchedCount}/${pricedItems.length} matched. Total: €${total.toFixed(2)}`);
@@ -151,6 +187,7 @@ export const measurementPricingFlow = ai.defineFlow(
         return {
             projectName: extraction.projectName,
             clientName: extraction.clientName,
+            projectType,
             items: pricedItems,
             summary: {
                 totalItems: pricedItems.length,
@@ -167,7 +204,7 @@ export const measurementPricingFlow = ai.defineFlow(
     }
 );
 
-function estimateFallbackPrice(item: MeasurementItem): number {
+function estimateFallbackPrice(item: any): number {
     // Simple heuristic for fallback pricing based on unit type
     const unitPrices: Record<string, number> = {
         'm²': 25,
@@ -181,6 +218,6 @@ function estimateFallbackPrice(item: MeasurementItem): number {
         'pa': 100,
     };
 
-    const unit = item.unit.toLowerCase();
+    const unit = item.unit?.toLowerCase() || '';
     return unitPrices[unit] || 30; // Default €30
 }

@@ -16,45 +16,8 @@ export async function createBudgetFromMeasurementsAction(
     pageCount?: number
 ) {
     try {
-        // Map extracted items to BudgetLineItem
-        const lineItems: BudgetLineItem[] = pricingOutput.items.map((item, index) => ({
-            id: crypto.randomUUID(),
-            order: index + 1,
-            originalTask: item.description,
-            found: !item.isEstimate, // If estimated, it wasn't strictly "found" in price book? Or maybe it was found in PDF?
-            // "found" in BudgetLineItem context usually means found in Price Book search. 
-            // Here, let's map it to !isEstimate (so if it matched a price book item, found=true)
-
-            item: {
-                code: item.priceBookCode || item.code || `GENERATED-${index}`,
-                description: item.description,
-                unit: item.unit,
-                quantity: item.quantity,
-                unitPrice: item.unitPrice,
-                totalPrice: item.totalPrice,
-            },
-            chapter: item.chapter || 'General',
-            // Store original values for ghost mode / comparison
-            originalState: {
-                unitPrice: item.unitPrice,
-                quantity: item.quantity,
-                description: item.description,
-                unit: item.unit,
-            },
-            note: item.isEstimate
-                ? '⚠️ Precio estimado por IA (No se encontró coincidencia exacta en Base de Precios)'
-                : `Coincidencia: ${Math.round(item.matchConfidence)}%`
-        }));
-
-        // Map summary to CostBreakdown
-        const costBreakdown: BudgetCostBreakdown = {
-            materialExecutionPrice: pricingOutput.summary.subtotal,
-            overheadExpenses: pricingOutput.summary.overheadExpenses,
-            industrialBenefit: pricingOutput.summary.industrialBenefit,
-            tax: pricingOutput.summary.iva,
-            globalAdjustment: 0,
-            total: pricingOutput.summary.total,
-        };
+        // The lineItems and costBreakdown variables are no longer needed as separate entities
+        // The new budget structure will be built directly in the createNewBudget call.
 
         // Create Budget
         const newBudget = await budgetService.createNewBudget({
@@ -62,20 +25,52 @@ export async function createBudgetFromMeasurementsAction(
             status: 'draft',    // Start as draft so admin can review
             version: 1,
             updatedAt: new Date(),
-            userId: 'admin',    // Assigned to admin for now
+            // leadId: 'admin', // Handled by budgetService or we generate one? Budget requires leadId.
+            leadId: randomUUID(), // Temporary until we have real Lead integration
 
-            clientData: {
+
+            clientSnapshot: {
                 name: pricingOutput.clientName || 'Cliente (Desde PDF)',
                 email: '', // Unknown
                 phone: '',
                 address: '',
-                projectScope: 'integral',
-                propertyType: 'residential',
-                description: `Presupuesto extraído de: ${fileName}`,
             },
 
-            lineItems,
-            costBreakdown,
+            specs: {
+                propertyType: 'flat', // Default to flat/apartment
+                interventionType: 'partial',
+                totalArea: 0,
+                qualityLevel: 'medium'
+            },
+
+            chapters: [{
+                id: randomUUID(),
+                name: "Presupuesto Importado",
+                order: 0,
+                items: pricingOutput.items.map((item, index) => ({
+                    type: 'PARTIDA',
+                    id: (item as any).id || randomUUID(),
+                    order: index,
+                    code: item.code || '',
+                    description: item.description,
+                    unit: item.unit,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice,
+                    totalPrice: item.totalPrice,
+                    originalTask: '',
+                    note: '',
+                    isEstimate: item.isEstimate
+                })),
+                totalPrice: pricingOutput.summary.total
+            }],
+            costBreakdown: {
+                materialExecutionPrice: pricingOutput.summary.subtotal,
+                overheadExpenses: pricingOutput.summary.overheadExpenses,
+                industrialBenefit: pricingOutput.summary.industrialBenefit,
+                tax: pricingOutput.summary.iva,
+                globalAdjustment: 0,
+                total: pricingOutput.summary.total,
+            },
             totalEstimated: pricingOutput.summary.total,
 
             // Metadata

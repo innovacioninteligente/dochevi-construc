@@ -20,8 +20,6 @@ export function ImageComparisonSlider({
     beforeLabel = "Antes",
     afterLabel = "Después"
 }: ImageComparisonProps) {
-    if (!beforeImage || !afterImage) return null;
-
     const [sliderChecked, setSliderChecked] = useState(false);
     const [position, setPosition] = useState(50);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -66,6 +64,8 @@ export function ImageComparisonSlider({
             window.removeEventListener('mousemove', handleMouseMove);
         };
     }, [sliderChecked, handleMouseUp, handleMouseMove]);
+
+    if (!beforeImage || !afterImage) return null;
 
 
     return (

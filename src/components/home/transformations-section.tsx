@@ -7,10 +7,10 @@ import { motion } from 'framer-motion';
 import { Volume2, VolumeX, Play } from 'lucide-react';
 
 export function TransformationsSection({ t }: { t: any }) {
-    if (!t) return null;
-
     const [isMuted, setIsMuted] = useState(true);
     const videoRef = useRef<HTMLVideoElement>(null);
+
+    if (!t) return null;
 
     const toggleMute = () => {
         if (videoRef.current) {

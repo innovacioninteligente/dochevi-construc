@@ -1,6 +1,7 @@
 import { z } from 'genkit';
 import { ai, gemini25Flash } from '@/backend/ai/config/genkit.config';
 import { BudgetRequirement } from '@/backend/budget/domain/budget-requirements';
+import { materialRetrieverTool } from '@/backend/ai/tools/material-retriever.tool';
 
 // Define the input schema for the flow
 const ClientRequirementsInput = z.object({
@@ -16,7 +17,7 @@ const ClientRequirementsInput = z.object({
 const ClientRequirementsOutput = z.object({
     response: z.string(),
     updatedRequirements: z.custom<Partial<BudgetRequirement>>(),
-    nextQuestion: z.string().optional(),
+    nextQuestion: z.string().nullable().optional(),
     isComplete: z.boolean(),
 });
 
@@ -29,6 +30,32 @@ export const clientRequirementsFlow = ai.defineFlow(
     async (input) => {
         const { userMessage, history = [], currentRequirements = {} } = input;
 
+        // Define Zod schemas for the LLM to understand the structure
+        const ProjectSpecsSchema = z.object({
+            propertyType: z.enum(['flat', 'house', 'office']).optional().describe("Type of property: 'flat' (Piso), 'house' (Casa), 'office' (Oficina)"),
+            interventionType: z.enum(['total', 'partial', 'new_build']).optional().describe("Scope of work: 'total' (Integral), 'partial' (Parcial), 'new_build' (Obra Nueva)"),
+            totalArea: z.number().optional().describe("Total area in square meters"),
+            qualityLevel: z.enum(['basic', 'medium', 'premium', 'luxury']).optional().describe("General quality level requested"),
+            demolition: z.boolean().optional(),
+            elevator: z.boolean().optional(),
+            parking: z.boolean().optional(),
+            description: z.string().optional(),
+        });
+
+        const DetectedNeedSchema = z.object({
+            category: z.string().describe("Category of the need (e.g., 'Flooring', 'Painting')"),
+            description: z.string().describe("Detail of the need"),
+            estimatedQuantity: z.number().optional(),
+            unit: z.string().optional()
+        });
+
+        const BudgetRequirementSchema = z.object({
+            specs: ProjectSpecsSchema.optional().describe("Technical specifications of the project"),
+            targetBudget: z.string().optional().describe("User's budget constraint if mentioned"),
+            urgency: z.string().optional().describe("When they want to start"),
+            detectedNeeds: z.array(DetectedNeedSchema).optional().describe("List of specific needs identified")
+        });
+
         // 1. Analysis Step: Extract requirements and determine next steps
         const analysisPrompt = `
       You are "Conserje", an expert Quantity Surveyor (Aparejador) and Architect for PriceCloud.
@@ -40,52 +67,41 @@ export const clientRequirementsFlow = ai.defineFlow(
       Conversation History: ${JSON.stringify(history)}
       
       BEHAVIOR GUIDELINES:
-      - Do NOT be satisfied with vague answers like "reformar baño" or "cambiar suelo".
-      - PROACTIVELY ask for:
-         * Dimensions (approx m2) if missing.
-         * Specific Materials (e.g., "Parket AC4 or AC5?", "Porcelain or Ceramic tiles?").
-         * Scope details (e.g., "Demolish partitions?", "New electrical panel?", "False ceilings?").
-      - Maintain a professional, helpful, but inquisitive persona.
-      - If the user asks for a budget, explain you need these details first to be accurate.
+      - **BE PROACTIVE & FAST**: Do NOT repeat or echo back what the user just said. Just update your internal state and ask the NEXT question immediately.
+      - **Tone**: Professional, direct, and efficient.
+      - **Multi-intent**: Accept multiple details at once.
+      - **Tools**: Use materialRetriever if asked for prices.
       
       Task:
       1. Analyze the user's message and history.
-      2. Extract new inputs mapping to the schema:
-         - propertyType (residential, commercial, office)
-         - projectScope (integral, partial)
-         - totalAreaM2 (number)
-         - numberOfRooms (number, bedrooms)
-         - numberOfBathrooms (number)
-         - qualityLevel (basic, medium, premium)
-         - targetBudget (string, e.g. "50k", "approx 50000")
-         - urgency (string, e.g. "ASAP", "next month")
-         - partialScope (array strings: bathroom, kitchen, painting, electricity, plumbing, etc.)
-         - Specific details: 'floorType' (parquet/tile/microcement), 'paintWalls' (bool), 'demolishPartitions' (bool), etc.
-      3. Update 'detectedNeeds' with granular items (e.g., "Demolición de 70m2 tabiques", "Suelo Parquet Roble AC5").
-      4. Determine if we have enough info for a ROUGH DRAFT.
-         We need AT LEAST: Property Type, Scope, Area, Room/Bath Counts, Quality Level.
-      5. Generate a response:
-         - Acknowledge what was understood (briefly).
-         - Ask the NEXT most important MISSING technical question.
-         
+      2. Extract new inputs mapping to the schema.
+      3. CRITICAL: MAPPING RULES:
+         - "Piso" -> propertyType: 'flat'
+         - "Casa/Chalet" -> propertyType: 'house'
+         - "Reforma integral" -> interventionType: 'total'
+         - "Reforma parcial" -> interventionType: 'partial'
+         - "Calidad media" -> qualityLevel: 'medium'
+      4. Place technical details (area, type, scope, quality) INSIDE the 'specs' object.
+      5. Generate a response asking the next missing question.
+      
       CRITICAL OUTPUT INSTRUCTIONS:
-      - Return ONLY valid JSON.
-      - Do NOT use control characters (e.g. \\b, \\t, backspace) inside the JSON strings.
-      - Keep the 'response' field concise (under 50 words) to avoid generation loops.
-      - Ensure 'missingFields' is always an array, even if empty.
+      - Return ONLY valid JSON matching the schema.
+      - Ensure 'isComplete' is true ONLY if you have: Type, Scope, Area, and Quality.
+      - 'response' must be under 40 words.
     `;
 
         const extractionSchema = z.object({
-            updatedRequirements: z.custom<Partial<BudgetRequirement>>().optional().default({}),
+            updatedRequirements: BudgetRequirementSchema.optional().default({}),
             response: z.string(),
-            nextQuestion: z.string().optional(),
-            missingFields: z.array(z.string()).optional().default([]), // Make optional to prevent crash
-            isComplete: z.boolean().optional().default(false),
+            nextQuestion: z.string().nullable().optional(),
+            missingFields: z.array(z.string()).optional().default([]),
+            isComplete: z.boolean().describe("Set to true if Type, Scope, Area, and Quality are all gathered."),
         });
 
         const llmResponse = await ai.generate({
             model: gemini25Flash,
             prompt: analysisPrompt,
+            tools: [materialRetrieverTool],
             output: { schema: extractionSchema },
             config: {
                 temperature: 0.3,
@@ -96,19 +112,24 @@ export const clientRequirementsFlow = ai.defineFlow(
         const result = llmResponse.output;
 
         if (!result) {
-            throw new Error("Failed to generate analysis");
+            console.error("LLM returned null or invalid JSON");
+            throw new Error("Failed to generate analysis - Model returned empty");
         }
 
-        // Merge the extracted requirements with the previous ones (simple merge for now)
-        // In a real app, you might want deeper merging logic
-        const updatedReqs = result.updatedRequirements || {}; // Defensive check
+        // Deep merge logic for specs
+        const newReqs = result.updatedRequirements || {};
+        const oldReqs = currentRequirements || {};
+
         const mergedRequirements = {
-            ...currentRequirements,
-            ...updatedReqs,
-            // Ensure specific fields are preserved if not overwritten
+            ...oldReqs,
+            ...newReqs,
+            specs: {
+                ...(oldReqs.specs || {}),
+                ...(newReqs.specs || {})
+            },
             detectedNeeds: [
-                ...(currentRequirements.detectedNeeds || []),
-                ...(updatedReqs.detectedNeeds || [])
+                ...(oldReqs.detectedNeeds || []),
+                ...(newReqs.detectedNeeds || [])
             ]
         };
 
@@ -116,7 +137,7 @@ export const clientRequirementsFlow = ai.defineFlow(
             response: result.response,
             updatedRequirements: mergedRequirements,
             nextQuestion: result.nextQuestion,
-            isComplete: result.isComplete
+            isComplete: result.isComplete || false
         };
     }
 );

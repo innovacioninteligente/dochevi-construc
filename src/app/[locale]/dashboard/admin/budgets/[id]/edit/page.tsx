@@ -3,9 +3,9 @@ import { BudgetEditorWrapper } from '@/components/budget-editor/BudgetEditorWrap
 import { notFound } from 'next/navigation';
 
 interface BudgetEditorPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 export default async function BudgetEditorPage({ params }: BudgetEditorPageProps) {
@@ -19,6 +19,6 @@ export default async function BudgetEditorPage({ params }: BudgetEditorPageProps
     }
 
     return (
-        <BudgetEditorWrapper budget={budget} />
+        <BudgetEditorWrapper budget={budget} isAdmin={true} />
     );
 }

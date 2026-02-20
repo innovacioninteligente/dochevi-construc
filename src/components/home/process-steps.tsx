@@ -11,9 +11,9 @@ import {
 import { useWidgetContext } from '@/context/budget-widget-context';
 
 export function ProcessSteps({ t }: { t: any }) {
-    if (!t) return null;
-
     const { openWidget } = useWidgetContext();
+
+    if (!t) return null;
 
     const icons = [
         <Sparkles className="h-8 w-8" key="0" />,

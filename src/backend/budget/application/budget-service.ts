@@ -12,7 +12,7 @@ export class BudgetService {
   }
 
   async findBudgetsForUser(userId: string): Promise<Budget[]> {
-    return this.budgetRepository.findByUserId(userId);
+    return this.budgetRepository.findByLeadId(userId);
   }
 
   async createNewBudget(data: Omit<Budget, 'id' | 'createdAt'>): Promise<Budget> {

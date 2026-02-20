@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,21 +24,7 @@ export default function AdminChatWindow({ conversationId }: AdminChatWindowProps
     const [sending, setSending] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        if (conversationId) {
-            loadMessages();
-            const interval = setInterval(loadMessages, 5000);
-            return () => clearInterval(interval);
-        }
-    }, [conversationId]);
-
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
-    }, [messages]);
-
-    const loadMessages = async () => {
+    const loadMessages = useCallback(async () => {
         try {
             // We need to implement this action or use the existing one but securely
             const result = await getConversationHistoryAction(conversationId);
@@ -50,7 +36,23 @@ export default function AdminChatWindow({ conversationId }: AdminChatWindowProps
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [conversationId]);
+
+    useEffect(() => {
+        if (conversationId) {
+            loadMessages();
+            const interval = setInterval(loadMessages, 5000);
+            return () => clearInterval(interval);
+        }
+    }, [conversationId, loadMessages]);
+
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+
 
     const handleSendMessage = async () => {
         if (!newMessage.trim() || sending) return;

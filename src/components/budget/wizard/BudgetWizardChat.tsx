@@ -8,20 +8,43 @@ import { useWidgetContext } from '@/context/budget-widget-context';
 import { useAudioRecorder } from '@/hooks/use-audio-recorder';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { RequirementCard } from './RequirementCard';
 import { BudgetRequirement } from '@/backend/budget/domain/budget-requirements';
 import { BudgetGenerationProgress, GenerationStep } from '@/components/budget/BudgetGenerationProgress';
 import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
 
-function calculateProgress(req: Partial<BudgetRequirement>) {
+import { Trash2 } from 'lucide-react';
+import { BudgetStreamListener } from './BudgetStreamListener';
+import { Toaster as SileoToaster } from 'sileo';
+import 'sileo/styles.css';
+
+// Update to accept 'state' to override score if AI thinks it's done
+function calculateProgress(req: Partial<BudgetRequirement>, state?: string) {
+    if (state === 'review') return 100;
+
     let score = 0;
+    // Core Requirements (Essential): 60% total
     if (req.specs?.propertyType) score += 20;
     if (req.specs?.interventionType) score += 20;
     if (req.specs?.totalArea) score += 20;
-    if (req.detectedNeeds?.length) score += 20;
-    if (req.attachmentUrls?.length) score += 20;
+
+    // Detailed Requirements:
+    // If we have detected needs, great (+30)
+    // If not, but we have attachments, good (+10)
+    // If the user has provided premium qualities or other specs (implied by non-empty specs keys > 3), give points
+
+    if (req.detectedNeeds?.length) {
+        score += 30; // 60 + 30 = 90 (Enough to start)
+    } else if (Object.keys(req.specs || {}).length > 3) {
+        // Fallback: If we have extras like 'quality' or 'floors' in specs
+        score += 20; // 60 + 20 = 80 (Enough to start)
+    }
+
+    if (req.attachmentUrls?.length) score += 10; // Bonus
+
+    // Cap at 100
     return Math.min(score, 100);
 }
 
@@ -38,6 +61,7 @@ export function BudgetWizardChat() {
         currentItem?: string;
         error?: string;
     }>({ step: 'idle' });
+    const [deepGeneration, setDeepGeneration] = React.useState(false); // NEW
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleAttachmentClick = () => {
@@ -117,6 +141,21 @@ export function BudgetWizardChat() {
             await startRecording();
         }
     };
+    const handleReset = async () => {
+        if (!leadId) return;
+        if (!confirm("¿Estás seguro de que quieres borrar la conversación? Esto no se puede deshacer.")) return;
+
+        setInput("Reseteando conversación...");
+        try {
+            const { resetConversationAction } = await import('@/actions/chat/reset-conversation.action');
+            await resetConversationAction(leadId);
+            window.location.reload();
+        } catch (error) {
+            console.error("Failed to reset:", error);
+            setInput("");
+        }
+    };
+
     const scrollRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll to bottom - MUST be before any conditional returns!
@@ -138,6 +177,16 @@ export function BudgetWizardChat() {
                         <p className="text-muted-foreground mt-2">
                             {budgetResult.itemCount} partidas • Total: €{budgetResult.total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                         </p>
+                        <div className="flex items-center justify-center gap-2 mb-4">
+                            <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                                {requirements.specs?.propertyType ? requirements.specs.propertyType : 'Nuevo Proyecto'}
+                            </Badge>
+                            {requirements.specs?.totalArea && (
+                                <Badge variant="secondary" className="text-[10px]">
+                                    {requirements.specs.totalArea} m²
+                                </Badge>
+                            )}
+                        </div>
                     </div>
                     <div className="flex flex-col gap-3">
                         <Button
@@ -164,33 +213,76 @@ export function BudgetWizardChat() {
         );
     }
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleKeyDown = async (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
+
+            // Check for Admin Commands
+            if (input.startsWith('/admin-claim')) {
+                const parts = input.split(' ');
+                const email = parts[1];
+                const secret = parts[2];
+
+                if (!email || !secret) {
+                    alert("Usage: /admin-claim <email> <secret>");
+                    return;
+                }
+
+                setInput("Setting admin claim...");
+                try {
+                    const { setAdminClaim } = await import('@/actions/debug/fix-account.action');
+                    const result = await setAdminClaim(email, secret);
+                    if (result.success) {
+                        alert(result.message);
+                        setInput("");
+                    } else {
+                        alert("Error: " + result.error);
+                        setInput("/admin-claim " + email + " " + secret);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Failed to execute command");
+                }
+                return;
+            }
+
             sendMessage(input);
         }
     };
 
     return (
-        <div className="flex h-full w-full overflow-hidden rounded-3xl border border-white/20 bg-white/95 dark:bg-black/90 shadow-2xl backdrop-blur-2xl ring-1 ring-black/5 dark:ring-white/10">
+        <div className="flex h-full w-full overflow-hidden md:rounded-3xl md:border md:border-white/20 bg-background md:bg-white/95 md:dark:bg-black/90 md:shadow-2xl md:backdrop-blur-2xl md:ring-1 md:ring-black/5 md:dark:ring-white/10 relative">
+            {/* Stream Listener for Sileo Notifications */}
+            <BudgetStreamListener />
+
             {/* Left Panel: Chat Interface */}
-            <div className="flex w-full flex-col md:w-3/4 relative h-full min-h-0">
+            <div className="flex w-full flex-col md:w-2/3 relative h-full min-h-0">
                 {/* Header */}
-                <header className="absolute top-0 left-0 right-0 z-10 flex h-20 items-center justify-between px-8 bg-gradient-to-b from-white/80 to-transparent dark:from-black/80 backdrop-blur-sm">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-400 to-orange-600 shadow-lg shadow-orange-500/20 ring-1 ring-white/20">
-                            <Sparkles className="h-5 w-5 text-white" />
+                <header className="absolute top-0 left-0 right-0 z-10 flex h-16 md:h-20 items-center justify-between px-4 md:px-8 bg-gradient-to-b from-background via-background/95 to-transparent backdrop-blur-sm">
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-400 to-orange-600 shadow-lg shadow-orange-500/20 ring-1 ring-white/20">
+                            <Sparkles className="h-4 w-4 md:h-5 md:w-5 text-white" />
                         </div>
                         <div>
-                            <h3 className="font-display text-lg font-bold text-gray-900 dark:text-white tracking-tight">Arquitecto IA</h3>
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wide uppercase">Asistente Inteligente</p>
+                            <h3 className="font-display text-base md:text-lg font-bold text-foreground tracking-tight">Arquitecto IA</h3>
+                            <p className="text-[10px] md:text-xs font-medium text-muted-foreground tracking-wide uppercase">Asistente Inteligente</p>
                         </div>
                     </div>
+
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleReset}
+                        className="text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        title="Borrar conversación y empezar de nuevo"
+                    >
+                        <Trash2 className="h-5 w-5" />
+                    </Button>
                 </header>
 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-0 custom-scrollbar relative">
-                    <div className="max-w-3xl mx-auto pt-24 pb-48 px-6 md:px-0 space-y-8">
+                <div className="flex-1 overflow-y-auto p-0 custom-scrollbar relative bg-background/50">
+                    <div className="max-w-4xl mx-auto pt-20 pb-40 px-4 md:px-0 space-y-6 md:space-y-8">
                         <AnimatePresence initial={false}>
                             {messages.length === 0 ? (
                                 <motion.div
@@ -232,9 +324,9 @@ export function BudgetWizardChat() {
                 </div>
 
                 {/* Floating Input Area */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-black dark:via-black/80 pointer-events-none flex justify-center">
-                    <div className="pointer-events-auto w-full max-w-3xl relative">
-                        <div className="relative flex items-end gap-2 rounded-2xl border border-gray-200/50 dark:border-white/10 bg-white/80 dark:bg-zinc-900/80 p-2 shadow-2xl shadow-gray-200/50 dark:shadow-black/50 backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/5 focus-within:ring-2 focus-within:ring-amber-500/20 transition-all duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-background via-background/90 to-transparent pointer-events-none flex justify-center z-20">
+                    <div className="pointer-events-auto w-full max-w-4xl relative">
+                        <div className="relative flex items-end gap-2 rounded-[2rem] border border-input bg-background/80 md:bg-white/80 md:dark:bg-zinc-900/80 p-1.5 md:p-2 shadow-2xl shadow-black/5 backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/5 focus-within:ring-2 focus-within:ring-amber-500/20 transition-all duration-300">
                             <input
                                 type="file"
                                 multiple
@@ -265,9 +357,9 @@ export function BudgetWizardChat() {
                                 <Button
                                     onClick={() => sendMessage(input)}
                                     size="icon"
-                                    className="h-10 w-10 shrink-0 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20 transition-all duration-200 hover:scale-105 active:scale-95"
+                                    className="h-10 w-10 md:h-12 md:w-12 shrink-0 rounded-full bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20 transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center"
                                 >
-                                    <Send className="h-4 w-4" />
+                                    <Send className="h-4 w-4 md:h-5 md:w-5" />
                                 </Button>
                             ) : (
                                 <Button
@@ -293,7 +385,7 @@ export function BudgetWizardChat() {
             </div>
 
             {/* Right Panel: Context & Requirements (Visible on Desktop) */}
-            <div className="hidden border-l border-gray-100 dark:border-white/5 md:flex md:w-1/4 flex-col bg-gray-50/50 dark:bg-zinc-900/50 backdrop-blur-sm h-full min-h-0">
+            <div className="hidden border-l border-gray-100 dark:border-white/5 md:flex md:w-1/3 flex-col bg-gray-50/50 dark:bg-zinc-900/50 backdrop-blur-sm h-full min-h-0">
                 <div className="h-20 border-b border-gray-100 dark:border-white/5 px-6 flex items-center justify-between shrink-0">
                     <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase">Datos del Proyecto</h4>
                     <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-500 text-[10px] font-bold rounded-md uppercase">
@@ -312,12 +404,12 @@ export function BudgetWizardChat() {
                     <div className="space-y-3 mb-4">
                         <div className="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400">
                             <span>Completado</span>
-                            <span className="text-gray-900 dark:text-white">{calculateProgress(requirements)}%</span>
+                            <span className="text-gray-900 dark:text-white">{calculateProgress(requirements, state)}%</span>
                         </div>
                         <div className="h-1.5 w-full rounded-full bg-gray-100 dark:bg-white/5 overflow-hidden">
                             <div
                                 className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-500"
-                                style={{ width: `${calculateProgress(requirements)}%` }}
+                                style={{ width: `${calculateProgress(requirements, state)}%` }}
                             />
                         </div>
                     </div>
@@ -332,9 +424,39 @@ export function BudgetWizardChat() {
                         )}
                     </AnimatePresence>
 
+                    {/* Deep Generation Toggle - Always visible for beta testing */}
+                    {generationProgress.step === 'idle' && (
+                        <div className="mb-4 flex items-center justify-between p-3 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20">
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-amber-800 dark:text-amber-500 flex items-center gap-1">
+                                    <Sparkles className="w-3 h-3" />
+                                    Generación Profunda
+                                    <Badge variant="outline" className="text-[9px] h-4 px-1 bg-white ml-2 text-amber-600 border-amber-200">Beta</Badge>
+                                </span>
+                                <span className="text-[10px] text-amber-700/70 dark:text-amber-500/70 leading-tight">
+                                    Desglosan por capítulos y partidas (más lento).
+                                </span>
+                            </div>
+                            <div
+                                className={cn(
+                                    "w-10 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out",
+                                    deepGeneration ? "bg-amber-500" : "bg-gray-200 dark:bg-white/10"
+                                )}
+                                onClick={() => setDeepGeneration(!deepGeneration)}
+                            >
+                                <div
+                                    className={cn(
+                                        "w-4 h-4 rounded-full bg-white shadow-sm transform transition-transform duration-200 ease-in-out",
+                                        deepGeneration ? "translate-x-4" : "translate-x-0"
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    )}
+
                     {/* Generate Button */}
                     <AnimatePresence>
-                        {calculateProgress(requirements) >= 80 && generationProgress.step === 'idle' && (
+                        {(calculateProgress(requirements, state) >= 80 || state === 'review') && generationProgress.step === 'idle' && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -382,7 +504,8 @@ export function BudgetWizardChat() {
                                             }, 3000);
 
                                             // Cast specs to ProjectSpecs - in a real app we would validate with Zod here
-                                            const result = await generateBudgetFromSpecsAction(leadId, requirements.specs as any);
+                                            // Trigger Deep Generation if enabled
+                                            const result = await generateBudgetFromSpecsAction(leadId, requirements.specs as any, deepGeneration);
 
                                             if (result.success && result.budgetResult) {
                                                 const budgetId = result.budgetId || result.budgetResult.id;
@@ -421,6 +544,7 @@ export function BudgetWizardChat() {
                     </AnimatePresence>
                 </div>
             </div>
+            <SileoToaster position="bottom-right" />
         </div>
     );
 }

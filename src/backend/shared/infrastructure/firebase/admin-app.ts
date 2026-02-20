@@ -1,10 +1,13 @@
 
 import { getApps, initializeApp, cert, App } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
 
 export function initFirebaseAdminApp(): App {
     if (getApps().length === 0) {
         // Check for Service Account in Env Vars (Local Dev)
         if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+            console.log("[AdminApp] Initializing with Service Account from Env Vars");
             return initializeApp({
                 credential: cert({
                     projectId: process.env.GCLOUD_PROJECT || process.env.FIREBASE_PROJECT_ID,
@@ -15,6 +18,7 @@ export function initFirebaseAdminApp(): App {
             });
         }
 
+        console.log("[AdminApp] Initializing with Default Credentials");
         // Production (Vercel/Cloud Run) / Fallback (if using ADC)
         return initializeApp({
             projectId: process.env.GCLOUD_PROJECT || process.env.FIREBASE_PROJECT_ID,
@@ -23,3 +27,7 @@ export function initFirebaseAdminApp(): App {
     }
     return getApps()[0];
 }
+
+export const adminApp = initFirebaseAdminApp();
+export const adminAuth = getAuth(adminApp);
+export const adminFirestore = getFirestore(adminApp);

@@ -213,7 +213,7 @@ export function PhilosophySection({
                     className="max-w-4xl mx-auto text-center"
                 >
                     <blockquote className="heading-display text-3xl md:text-4xl lg:text-5xl leading-relaxed mb-8">
-                        "{quote}"
+                        &quot;{quote}&quot;
                     </blockquote>
 
                     {author && (

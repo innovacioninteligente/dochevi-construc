@@ -66,6 +66,10 @@ export class FirestoreConversationRepository implements ConversationRepository {
         return snapshot.docs.map((doc: any) => this.mapDocToConversation(doc.id, doc.data()));
     }
 
+    async delete(id: string): Promise<void> {
+        await this.collection.doc(id).delete();
+    }
+
     private mapDocToConversation(id: string, data: any): Conversation {
         return new Conversation(
             id,

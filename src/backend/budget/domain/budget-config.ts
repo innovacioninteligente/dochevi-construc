@@ -18,6 +18,10 @@ export interface BudgetConfig {
     // Tarifas Base
     baseIntegralReformRateM2?: number; // Tarifa base por m2 para reformas integrales (ej: 650)
 
+    // Márgenes específicos por tipo de recurso (antes de GG/BI)
+    materialMargin?: number; // Margen comercial sobre materiales (ej: 0.10 para 10%)
+    laborMargin?: number; // Margen sobre mano de obra (ej: 0.0)
+
     updatedAt: Date;
     updatedBy: string;
 }
@@ -29,6 +33,8 @@ export const DEFAULT_BUDGET_CONFIG: BudgetConfig = {
     iva: 0.10, // 10% IVA Reducido
     globalAdjustmentFactor: 1.0, // Sin ajuste extra
     baseIntegralReformRateM2: 650, // 650€/m2 estandard
+    materialMargin: 0.10, // 10% margen materiales por defecto
+    laborMargin: 0.0, // Solo coste
     updatedAt: new Date(),
     updatedBy: 'system'
 };

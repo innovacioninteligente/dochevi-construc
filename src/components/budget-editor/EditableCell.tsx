@@ -40,6 +40,13 @@ export const EditableCell = ({
         }
     };
 
+    useEffect(() => {
+        if (type === 'textarea' && inputRef.current) {
+            inputRef.current.style.height = 'auto';
+            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+        }
+    }, [localValue, type]);
+
     if (!isEditing) {
         return (
             <div className={cn("px-2 py-1 min-h-[2rem] flex items-center", className)}>
@@ -50,13 +57,6 @@ export const EditableCell = ({
             </div>
         );
     }
-
-    useEffect(() => {
-        if (type === 'textarea' && inputRef.current) {
-            inputRef.current.style.height = 'auto';
-            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-        }
-    }, [localValue, type]);
 
     if (type === 'textarea') {
         return (

@@ -3,6 +3,7 @@ import { ThemeProvider } from "next-themes";
 import '../globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
+import { Toaster as SileoToaster } from 'sileo';
 import { Providers } from '@/components/providers/query-provider';
 import { AuthProvider } from '@/context/auth-context';
 import { BudgetWidgetProvider } from '@/context/budget-widget-context';
@@ -11,11 +12,14 @@ import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/dictionaries';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { SmartBudgetTrigger } from '@/components/budget-widget/smart-trigger';
-import { SmartBudgetModal } from '@/components/budget-widget/budget-modal';
+import { SmartBudgetWrapper } from '@/components/budget-widget/smart-budget-wrapper';
 import localFont from 'next/font/local';
 import { getTranslations } from 'next-intl/server';
 import { constructMetadata } from '@/i18n/seo-utils';
+
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 const gencha = localFont({
   src: '../../../public/fonts/GenchaRegularDemo.otf',
@@ -73,13 +77,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <head>
-        {faviconUrl && <link rel="icon" href={faviconUrl} sizes="any" />}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
-      </head>
-      <body className={cn('font-body antialiased min-h-screen bg-background flex flex-col', gencha.variable, genchaDisplay.variable)}>
+      <body className={cn('font-body antialiased min-h-screen bg-background flex flex-col', gencha.variable, genchaDisplay.variable, inter.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="theme-gold"
@@ -97,9 +95,9 @@ export default async function RootLayout({
               <AuthProvider>
                 <BudgetWidgetProvider>
                   {children}
-                  <SmartBudgetTrigger dictionary={dict?.budgetRequest} />
-                  <SmartBudgetModal dictionary={dict?.budgetRequest} />
-                  <Toaster />
+                  <SmartBudgetWrapper dictionary={dict?.budgetRequest} />
+                  <Toaster /> {/* Radix Toaster */}
+                  <SileoToaster /> {/* Sileo Toaster */}
                 </BudgetWidgetProvider>
               </AuthProvider>
             </Providers>

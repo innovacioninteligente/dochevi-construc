@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { BudgetWidget } from '@/components/budget-widget';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
@@ -54,10 +55,12 @@ export function Header({ t }: { t: any }) {
       <div className="w-[85vw] max-w-[1920px] mx-auto flex h-full items-center justify-between transition-all duration-300">
         <div className={cn("transition-transform duration-300 flex-shrink-0", isScrolled ? "scale-90" : "scale-100")}>
           <Link href="/" className="block relative h-12 w-auto aspect-[3/1] md:h-16">
-            <img
+            <Image
               src="/images/logo.avif"
               alt="Grupo RG Logo"
-              className="h-full w-auto object-contain"
+              fill
+              className="object-contain"
+              priority
             />
           </Link>
         </div>

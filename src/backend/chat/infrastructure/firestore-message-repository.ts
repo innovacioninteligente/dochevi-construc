@@ -64,6 +64,18 @@ export class FirestoreMessageRepository implements MessageRepository {
         });
 
         await batch.commit();
+        await batch.commit();
+    }
+
+    async deleteByConversationId(conversationId: string): Promise<void> {
+        const snapshot = await this.collection.where('conversationId', '==', conversationId).get();
+        if (snapshot.empty) return;
+
+        const batch = this.db.batch();
+        snapshot.docs.forEach((doc: any) => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
     }
 
     private mapDocToMessage(id: string, data: any): Message {

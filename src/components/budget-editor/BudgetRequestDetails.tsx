@@ -30,6 +30,8 @@ const TextItem = ({ label, value }: { label: string, value?: string | number }) 
 };
 
 export const BudgetRequestDetails = ({ data }: { data: DetailedFormValues }) => {
+    if (!data) return <div className="p-4 text-sm text-muted-foreground">No hay detalles disponibles.</div>;
+
     return (
         <Card className="border-0 shadow-none bg-transparent">
             {/* Removed redundant header since wrapper already has title */}

@@ -22,7 +22,7 @@ export const webPriceSearchTool = ai.defineTool(
         // This acts as a semantic fallback.
 
         const prompt = `
-            You are an expert Construction Cost Estimator for Spain (2024-2025).
+            You are an expert Construction Cost Estimator for Spain (2024-2026).
             The user is asking for the price of: "${input.query}".
             This item was NOT found in the database, so you must estimate it based on market knowledge.
             

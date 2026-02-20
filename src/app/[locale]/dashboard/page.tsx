@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDictionary } from '@/lib/dictionaries';
 import Link from 'next/link';
-import { ArrowRight, FileText, Lightbulb, TrendingUp, Users, Clock, Sparkles, Activity, Search, ShieldCheck } from 'lucide-react';
+import { ArrowRight, FileText, Lightbulb, TrendingUp, Users, Clock, Sparkles, Activity, Search, ShieldCheck, Building2, Receipt, BarChart3 } from 'lucide-react';
 import { getAllBudgetsAction } from '@/actions/budget/get-all-budgets.action';
 import { DashboardRequestCard } from '@/components/dashboard/dashboard-request-card';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,44 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
   };
+
+  const QUICK_ACTIONS = [
+    {
+      href: '/dashboard/admin/budgets',
+      title: t.nav.myBudgets,
+      description: 'Acceda al historial completo de presupuestos y estados.',
+      icon: FileText,
+      color: 'purple',
+    },
+    {
+      href: '/dashboard/projects',
+      title: 'Mis Obras',
+      description: 'Gestione sus proyectos de construcción en curso.',
+      icon: Building2,
+      color: 'indigo',
+    },
+    {
+      href: '/dashboard/expenses',
+      title: 'Facturas',
+      description: 'Registre y valide facturas de proveedores.',
+      icon: Receipt,
+      color: 'emerald',
+    },
+    {
+      href: '/dashboard/analytics',
+      title: 'Analíticas',
+      description: 'Visibilidad financiera en tiempo real.',
+      icon: BarChart3,
+      color: 'blue',
+    },
+    {
+      href: '/dashboard/seo-generator',
+      title: t.seoGenerator.title,
+      description: t.seoGenerator.description,
+      icon: Lightbulb,
+      color: 'amber',
+    },
+  ];
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -131,40 +169,25 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
               <DashboardRequestCard t={t.requestBudget} />
             </div>
 
-            {/* Secondary Actions */}
-            <Link href="/dashboard/admin/budgets" className="group">
-              <Card className="h-full border-zinc-200 dark:border-zinc-800 hover:border-primary/50 hover:shadow-md transition-all duration-300">
-                <CardHeader>
-                  <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-                    <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <CardTitle className="group-hover:text-purple-700 transition-colors flex items-center gap-2">
-                    {t.nav.myBudgets}
-                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                  </CardTitle>
-                  <CardDescription>
-                    Acceda al historial completo de presupuestos y estados.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-
-            <Link href="/dashboard/seo-generator" className="group">
-              <Card className="h-full border-zinc-200 dark:border-zinc-800 hover:border-primary/50 hover:shadow-md transition-all duration-300">
-                <CardHeader>
-                  <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-                    <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <CardTitle className="group-hover:text-amber-700 transition-colors flex items-center gap-2">
-                    {t.seoGenerator.title}
-                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                  </CardTitle>
-                  <CardDescription>
-                    {t.seoGenerator.description}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
+            {/* Configurable Secondary Actions */}
+            {QUICK_ACTIONS.map((action) => (
+              <Link key={action.href} href={action.href} className="group">
+                <Card className="h-full border-zinc-200 dark:border-zinc-800 hover:border-primary/50 hover:shadow-md transition-all duration-300">
+                  <CardHeader>
+                    <div className={`w-10 h-10 rounded-lg bg-${action.color}-50 dark:bg-${action.color}-900/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300`}>
+                      <action.icon className={`w-5 h-5 text-${action.color}-600 dark:text-${action.color}-400`} />
+                    </div>
+                    <CardTitle className={`group-hover:text-${action.color}-700 transition-colors flex items-center gap-2`}>
+                      {action.title}
+                      <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </CardTitle>
+                    <CardDescription>
+                      {action.description}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
           </div>
         </div>
 

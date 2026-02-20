@@ -36,7 +36,7 @@ export function PhilosophySection({
                     </div>
 
                     <blockquote className="heading-display text-3xl md:text-5xl lg:text-6xl leading-tight mb-12 font-medium">
-                        "{quote}"
+                        &quot;{quote}&quot;
                     </blockquote>
 
                     {description && (

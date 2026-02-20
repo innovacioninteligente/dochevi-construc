@@ -1,5 +1,7 @@
 'use client';
 
+import { SmartAddInput } from './SmartAddInput';
+
 import { useState, useEffect } from 'react';
 import { Search, Plus, Package, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -52,18 +54,28 @@ export const BudgetLibrarySidebar = ({ onAddItem }: BudgetLibrarySidebarProps) =
 
     const handleAdd = (dbItem: PriceBookItem) => {
         // Map PriceBookItem to EditableBudgetLineItem structure
+        // Heuristic to determine type
+        // If it has a breakdown, it's a PARTIDA (composed).
+        // If it has only material price and no labor, it's likely a MATERIAL or simple supply.
+        // If unit is 'h', it's LABOR.
+        let inferredType: 'PARTIDA' | 'MATERIAL' = 'PARTIDA';
+
+        if ((dbItem.priceMaterial || 0) > 0 && (dbItem.priceLabor || 0) === 0 && (!dbItem.breakdown || dbItem.breakdown.length === 0)) {
+            inferredType = 'MATERIAL';
+        }
+
         const newItem: Partial<EditableBudgetLineItem> = {
-            originalTask: dbItem.description.substring(0, 50) + (dbItem.description.length > 50 ? '...' : ''), // Title from initial description
-            chapter: 'General', // We don't have explicit chapters in PriceBookItem yet, default to General or maybe categorize later?
-            // Actually, if we had a category field in PriceBookItem we would use it. 
-            // For now, let's leave it as 'General' or let the user move it.
+            originalTask: dbItem.description.substring(0, 50) + (dbItem.description.length > 50 ? '...' : ''),
+            chapter: 'General',
+            type: inferredType, // Set the inferred type
             item: {
                 description: dbItem.description,
                 unit: dbItem.unit,
                 quantity: 1,
-                unitPrice: dbItem.priceTotal, // Use the total execution price as the unit price for the client budget
+                unitPrice: dbItem.priceTotal,
                 totalPrice: dbItem.priceTotal,
-                code: dbItem.code
+                code: dbItem.code,
+                matchConfidence: 100 // It's from the catalog
             },
             originalState: {
                 unitPrice: dbItem.priceTotal,
@@ -81,11 +93,18 @@ export const BudgetLibrarySidebar = ({ onAddItem }: BudgetLibrarySidebarProps) =
 
     return (
         <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm flex flex-col h-[calc(100vh-180px)] overflow-hidden">
-            <div className="p-4 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
-                <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-3">
-                    <Package className="w-4 h-4 text-primary dark:text-primary/90" />
-                    Biblioteca de Precios
-                </h3>
+            <div className="p-4 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 space-y-4">
+                <div className="space-y-2">
+                    <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <Package className="w-4 h-4 text-primary dark:text-primary/90" />
+                        Biblioteca de Precios
+                    </h3>
+                    <SmartAddInput
+                        onAddItems={(newItems) => newItems.forEach(onAddItem)}
+                        className="shadow-sm"
+                    />
+                </div>
+
                 <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 dark:text-white/40" />
                     <Input

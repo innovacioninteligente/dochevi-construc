@@ -1,6 +1,6 @@
 
 import { genkit } from 'genkit';
-import { googleAI, geminiEmbedding001, gemini } from '@genkit-ai/googleai';
+import { googleAI, geminiEmbedding001, textEmbedding004, gemini } from '@genkit-ai/googleai';
 
 /**
  * Shared Genkit Instance Configuration.
@@ -16,6 +16,9 @@ export const ai = genkit({
 });
 
 // Export the Embedding Model Reference
+// Using geminiEmbedding001 which supports outputDimensionality.
+// Firestore requires exactly 768 dimensions.
 export const embeddingModel = geminiEmbedding001;
+
 // Use the model reference from the plugin
 export const gemini25Flash = gemini('gemini-2.5-flash');

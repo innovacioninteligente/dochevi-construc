@@ -22,8 +22,8 @@ import { constructMetadata } from '@/i18n/seo-utils';
 
 // ... (existing imports)
 
-export async function generateMetadata({ params }: { params: { slug: string; locale: string } }): Promise<Metadata> {
-  const { slug, locale } = params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
+  const { slug, locale } = await params;
   const post = blogPosts.find((p) => p.slug === slug);
 
   if (!post) {
@@ -41,9 +41,10 @@ export async function generateMetadata({ params }: { params: { slug: string; loc
   });
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string, locale: any } }) {
-  const post = blogPosts.find((p) => p.slug === params.slug);
-  const dict = await getDictionary(params.locale);
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string, locale: any }> }) {
+  const resolvedParams = await params;
+  const post = blogPosts.find((p) => p.slug === resolvedParams.slug);
+  const dict = await getDictionary(resolvedParams.locale);
   const t_cta = dict.blog.cta;
 
   if (!post) {

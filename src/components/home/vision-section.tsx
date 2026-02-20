@@ -9,8 +9,6 @@ import { ShieldCheck, MonitorPlay, Clock, Gem, Play, X, Maximize2 } from 'lucide
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
 
 export function VisionSection({ t }: { t: any }) {
-    if (!t) return null;
-
     const [isVideoOpen, setIsVideoOpen] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const videoUrl = "https://firebasestorage.googleapis.com/v0/b/local-digital-eye.firebasestorage.app/o/business%2FGRUPO RG%2Fexpress_corporativo.mp4?alt=media&token=3916f648-aa3a-4b9c-9f62-17e9ff8ff74d"
@@ -23,6 +21,8 @@ export function VisionSection({ t }: { t: any }) {
 
     const y1 = useTransform(scrollYProgress, [0, 1], [100, -100]);
     const y2 = useTransform(scrollYProgress, [0, 1], [0, -50]);
+
+    if (!t) return null;
 
     const icons = [
         <ShieldCheck className="h-6 w-6 text-primary" key="0" />,

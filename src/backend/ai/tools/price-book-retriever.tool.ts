@@ -21,7 +21,10 @@ export const priceBookRetrieverTool = ai.defineTool(
                 code: z.string(),
                 description: z.string(),
                 priceTotal: z.number(),
+                priceLabor: z.number().optional(),
+                priceMaterial: z.number().optional(),
                 unit: z.string(),
+                breakdown: z.array(z.any()).optional()
             })),
         }),
     },
@@ -33,17 +36,24 @@ export const priceBookRetrieverTool = ai.defineTool(
             const embedding = await vectorizer.embedText(input.query);
 
             // 2. Search in Repository
-            const results = await priceBookRepo.searchByVector(embedding, input.limit, input.year);
+            const results = await priceBookRepo.searchByVector(embedding, input.limit, input.year, input.query);
 
             console.log(`[Tool:PriceBookRetriever] Found ${results.length} items.`);
+            if (results.length > 0) {
+                console.log(`[Tool:PriceBookRetriever] First item keys: ${Object.keys(results[0]).join(', ')}`);
+                console.log(`[Tool:PriceBookRetriever] First item sample:`, JSON.stringify(results[0], null, 2));
+            }
 
             // 3. Map to output schema (keep it minimal/token-efficient for LLM)
             return {
                 items: results.map(item => ({
-                    code: item.code,
-                    description: item.description,
-                    priceTotal: item.priceTotal,
-                    unit: item.unit,
+                    code: item.code || 'UNKNOWN',
+                    description: item.description || 'No Description',
+                    priceTotal: item.priceTotal || 0,
+                    priceLabor: item.priceLabor,
+                    priceMaterial: item.priceMaterial,
+                    unit: item.unit || 'ud',
+                    breakdown: item.breakdown
                 }))
             };
         } catch (error) {

@@ -27,6 +27,6 @@ export class SearchPriceBookService {
         }
 
         // 2. Perform Vector Search
-        return this.repository.searchByVector(vector, limit, year);
+        return this.repository.searchByVector(vector, limit, year, query);
     }
 }

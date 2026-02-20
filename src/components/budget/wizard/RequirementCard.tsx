@@ -27,77 +27,69 @@ export function RequirementCard({ requirements, className }: RequirementCardProp
         <ScrollArea className={cn("h-full pr-4", className)}>
             <div className="space-y-6">
                 {/* Key Metrics Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                    <MetricItem
-                        icon={Home}
-                        label="Tipo"
-                        value={requirements.propertyType ? translateType(requirements.propertyType) : '-'}
-                        filled={!!requirements.propertyType}
-                    />
-                    <MetricItem
-                        icon={Layers}
-                        label="Alcance"
-                        value={requirements.projectScope ? translateScope(requirements.projectScope) : '-'}
-                        filled={!!requirements.projectScope}
-                    />
-                    <MetricItem
-                        icon={Ruler}
-                        label="Superficie"
-                        value={requirements.totalAreaM2 ? `${requirements.totalAreaM2} m²` : '-'}
-                        filled={!!requirements.totalAreaM2}
-                    />
-                    <MetricItem
-                        icon={Hammer}
-                        label="Habitaciones"
-                        value={requirements.numberOfRooms ? requirements.numberOfRooms.toString() : '-'}
-                        filled={!!requirements.numberOfRooms}
-                    />
-                    <MetricItem
-                        icon={Wallet}
-                        label="Presupuesto"
-                        value={requirements.targetBudget || '-'}
-                        filled={!!requirements.targetBudget}
-                    />
-                    <MetricItem
-                        icon={Clock}
-                        label="Urgencia"
-                        value={requirements.urgency || '-'}
-                        filled={!!requirements.urgency}
-                    />
-                </div>
-
-                {/* Detected Needs List */}
-                {requirements.detectedNeeds && requirements.detectedNeeds.length > 0 && (
-                    <div className="space-y-3">
-                        <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-white/50">Partidas Identificadas</h5>
-                        <div className="flex flex-wrap gap-2">
-                            <AnimatePresence>
-                                {requirements.detectedNeeds.map((need, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="inline-flex items-center gap-1.5 rounded-full border border-border/50 dark:border-white/10 bg-background/50 dark:bg-white/5 px-3 py-1 text-xs text-foreground dark:text-white/80"
-                                    >
-                                        <Check className="h-3 w-3 text-amber-500" />
-                                        {need.category}
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                )}
-
-                {/* Quality Badge (Optional) */}
-                {requirements.qualityLevel && (
-                    <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-center">
-                        <span className="text-xs text-amber-600 dark:text-amber-400 font-medium uppercase tracking-wide">
-                            Calidad: {translateQuality(requirements.qualityLevel)}
-                        </span>
-                    </div>
-                )}
+                <MetricItem
+                    icon={Home}
+                    label="Tipo"
+                    value={requirements.specs?.propertyType ? translateType(requirements.specs.propertyType) : '-'}
+                    filled={!!requirements.specs?.propertyType}
+                />
+                <MetricItem
+                    icon={Layers}
+                    label="Alcance"
+                    value={requirements.specs?.interventionType ? translateScope(requirements.specs.interventionType) : '-'}
+                    filled={!!requirements.specs?.interventionType}
+                />
+                <MetricItem
+                    icon={Ruler}
+                    label="Superficie"
+                    value={requirements.specs?.totalArea ? `${requirements.specs.totalArea} m²` : '-'}
+                    filled={!!requirements.specs?.totalArea}
+                />
+                <MetricItem
+                    icon={Wallet}
+                    label="Presupuesto"
+                    value={requirements.targetBudget || '-'}
+                    filled={!!requirements.targetBudget}
+                />
+                <MetricItem
+                    icon={Clock}
+                    label="Urgencia"
+                    value={requirements.urgency || '-'}
+                    filled={!!requirements.urgency}
+                />
             </div>
-        </ScrollArea>
+
+            {/* Detected Needs List */}
+            {requirements.detectedNeeds && requirements.detectedNeeds.length > 0 && (
+                <div className="space-y-3">
+                    <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-white/50">Partidas Identificadas</h5>
+                    <div className="flex flex-wrap gap-2">
+                        <AnimatePresence>
+                            {requirements.detectedNeeds.map((need, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="inline-flex items-center gap-1.5 rounded-full border border-border/50 dark:border-white/10 bg-background/50 dark:bg-white/5 px-3 py-1 text-xs text-foreground dark:text-white/80"
+                                >
+                                    <Check className="h-3 w-3 text-amber-500" />
+                                    {need.category}
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                </div>
+            )}
+
+            {/* Quality Badge (Optional) */}
+            {requirements.specs?.qualityLevel && (
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-center">
+                    <span className="text-xs text-amber-600 dark:text-amber-400 font-medium uppercase tracking-wide">
+                        Calidad: {translateQuality(requirements.specs.qualityLevel)}
+                    </span>
+                </div>
+            )}
+        </ScrollArea >
     );
 }
 

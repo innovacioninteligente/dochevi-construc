@@ -148,7 +148,7 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
                         {/* Configuration */}
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label>1. Sube la foto actual ("Antes")</Label>
+                                <Label>1. Sube la foto actual (&quot;Antes&quot;)</Label>
                                 <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 transition-colors relative">
                                     <Input
                                         type="file"
@@ -237,7 +237,7 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
 
                         {/* Result */}
                         <div className="space-y-4">
-                            <Label>Resultado ("Después")</Label>
+                            <Label>Resultado (&quot;Después&quot;)</Label>
                             <div className="w-full aspect-video bg-slate-100 rounded-lg flex items-center justify-center border overflow-hidden relative group">
                                 {generatedImage ? (
                                     <>

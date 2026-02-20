@@ -1,5 +1,6 @@
 ﻿
 import { Link } from '@/i18n/navigation';
+import Image from 'next/image';
 
 export function Footer({ t }: { t?: any }) {
   const currentYear = new Date().getFullYear();
@@ -9,11 +10,14 @@ export function Footer({ t }: { t?: any }) {
         <div className="grid md:grid-cols-3 gap-8 items-center text-center md:text-left">
           <div className="flex flex-col items-center md:items-start gap-4">
             <div className="bg-white/5 p-3 rounded-lg w-fit mb-2">
-              <img
-                src="/images/logo.avif"
-                alt="Grupo RG Logo"
-                className="h-10 w-auto object-contain brightness-0 invert opacity-90"
-              />
+              <div className="relative h-10 w-32 mb-2">
+                <Image
+                  src="/images/logo.avif"
+                  alt="Grupo RG Logo"
+                  fill
+                  className="object-contain brightness-0 invert opacity-90"
+                />
+              </div>
             </div>
             <p className="text-sm text-gray-400 max-w-xs">
               Exclusividad y detalle en cada proyecto. Construimos sueños.

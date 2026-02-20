@@ -92,7 +92,7 @@ export default function MeasurementsPage() {
     const [fileName, setFileName] = useState<string>('');
     const [isSaving, setIsSaving] = useState(false);
 
-    const processFile = async (file: File) => {
+    const processFile = useCallback(async (file: File) => {
         setFileName(file.name);
         setStep('uploading');
         setProgress(10);
@@ -146,13 +146,13 @@ export default function MeasurementsPage() {
             setStep('error');
             setError(err instanceof Error ? err.message : 'Error desconocido al procesar el archivo');
         }
-    };
+    }, [step]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
             processFile(acceptedFiles[0]);
         }
-    }, []);
+    }, [processFile]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,

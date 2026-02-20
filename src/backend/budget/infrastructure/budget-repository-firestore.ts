@@ -24,8 +24,8 @@ export class BudgetRepositoryFirestore implements BudgetRepository {
     return this.mapDocToBudget(doc);
   }
 
-  async findByUserId(userId: string): Promise<Budget[]> {
-    const snapshot = await this.collection.where('userId', '==', userId).get();
+  async findByLeadId(leadId: string): Promise<Budget[]> {
+    const snapshot = await this.collection.where('leadId', '==', leadId).get();
     return snapshot.docs.map(doc => this.mapDocToBudget(doc));
   }
 
@@ -43,6 +43,11 @@ export class BudgetRepositoryFirestore implements BudgetRepository {
     }, { merge: true });
   }
 
+  async delete(id: string): Promise<void> {
+    console.log(`[Infrastructure] Deleting budget from Firestore: ${id}`);
+    await this.collection.doc(id).delete();
+  }
+
   private mapDocToBudget(doc: any): Budget {
     const data = doc.data();
 
@@ -58,6 +63,8 @@ export class BudgetRepositoryFirestore implements BudgetRepository {
       renders: renders,
       createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : (new Date(data.createdAt) || new Date()),
       updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : (new Date(data.updatedAt) || new Date()),
+      // Ensure we map back the new structure if needed, or default empty chapters if migrating
+      chapters: data.chapters || [],
     } as Budget;
   }
 }

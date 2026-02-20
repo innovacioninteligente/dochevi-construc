@@ -39,4 +39,8 @@ export interface ProjectSpecs {
     demolition?: boolean;
     elevator?: boolean;
     parking?: boolean;
+
+    // User provided context
+    description?: string;
+    files?: string[];
 }

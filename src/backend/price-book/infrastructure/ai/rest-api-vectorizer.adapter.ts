@@ -9,7 +9,7 @@ interface GeminiEmbeddingResponse {
 
 export class RestApiVectorizerAdapter implements VectorizerPort {
     private apiKey: string;
-    // Updated: embedding-001 and text-embedding-004 deprecated. Using gemini-embedding-001 (Google's current stable model)
+    // Reverted to gemini-embedding-001 as text-embedding-004 is unavailable for this key
     private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent';
 
     constructor() {

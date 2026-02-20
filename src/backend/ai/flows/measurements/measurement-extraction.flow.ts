@@ -20,7 +20,8 @@ export const MeasurementItemSchema = z.object({
     // These will be filled later by pricing flow
     unitPrice: z.number().optional(),
     totalPrice: z.number().optional(),
-    // Added for hybrid context
+    // Added for classification
+    type: z.enum(['PARTIDA', 'MATERIAL']).optional().describe('Classify if this is a labor unit (Partida) or pure supply (Material)'),
     page: z.number().optional().describe('Page number where this item was found'),
     chapter: z.string().optional().describe('Chapter name derived from context'),
     section: z.string().optional().describe('Section name derived from context'),
@@ -64,6 +65,9 @@ Para cada partida, extrae:
 - description: descripción del trabajo.
 - unit: unidad (m², m, ud).
 - quantity: cantidad.
+- type: Clasifica el item:
+    - "PARTIDA": Si implica mano de obra + materiales (ej: "Demolición de tabique", "Alicatado de baño").
+    - "MATERIAL": Si es solo suministro de un producto (ej: "Grifo monomando", "Saco de cemento").
 
 IMPORTANTE SOBRE NÚMEROS:
 - El documento usa formato europeo/español: ',' para decimales y '.' para miles.

@@ -13,11 +13,29 @@ export async function createBudgetAction(
     clientData: BudgetClientData
 ) {
     try {
+        // Map clientData to specs and snapshot
+        const specs: any = {
+            propertyType: (clientData as any).propertyType || 'flat',
+            interventionType: 'partial',
+            totalArea: (clientData as any).totalArea || 0,
+            qualityLevel: 'medium',
+            // Map other fields if available in BudgetClientData
+        };
+
         const newBudget = await budgetService.createNewBudget({
             type,
-            clientData,
             status: 'pending_review',
-            lineItems: [], // Initial empty line items
+            version: 1,
+            updatedAt: new Date(),
+            leadId: crypto.randomUUID(), // TODO: Link to real lead
+            clientSnapshot: {
+                name: clientData.name,
+                email: clientData.email,
+                phone: clientData.phone,
+                address: clientData.address
+            },
+            specs,
+            chapters: [], // Initial empty chapters
             costBreakdown: {
                 materialExecutionPrice: 0,
                 overheadExpenses: 0,
@@ -27,9 +45,7 @@ export async function createBudgetAction(
                 total: 0
             },
             totalEstimated: 0,
-            updatedAt: new Date(),
-            version: 1,
-            userId: 'guest', // Or authenticated user ID if available in context
+            source: 'manual',
         });
 
         // Revalidate admin dashboard so new budget appears immediately

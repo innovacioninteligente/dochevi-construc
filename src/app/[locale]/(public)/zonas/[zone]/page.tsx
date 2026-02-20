@@ -15,7 +15,8 @@ export async function generateStaticParams() {
 
 import { constructMetadata } from '@/i18n/seo-utils';
 
-export async function generateMetadata({ params: { locale, zone } }: { params: { locale: string; zone: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; zone: string }> }): Promise<Metadata> {
+    const { locale, zone } = await params;
     const locationName = zone.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     return constructMetadata({
@@ -27,7 +28,8 @@ export async function generateMetadata({ params: { locale, zone } }: { params: {
     });
 }
 
-export default async function LocationPage({ params: { locale, zone } }: { params: { locale: string; zone: string } }) {
+export default async function LocationPage({ params }: { params: Promise<{ locale: string; zone: string }> }) {
+    const { locale, zone } = await params;
     const locationName = zone.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     // We ideally want a dictionary for this, but for now we fallback to generic content

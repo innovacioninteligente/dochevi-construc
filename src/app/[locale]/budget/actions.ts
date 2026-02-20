@@ -6,6 +6,11 @@ import { FormToSpecsMapper } from '@/backend/budget/application/mappers/form-to-
 import { generateBudgetFlow } from '@/backend/ai/flows/budget/generate-budget.flow';
 import { BudgetRepositoryFirestore } from '@/backend/budget/infrastructure/budget-repository-firestore';
 import { Budget } from '@/backend/budget/domain/budget';
+import { runWithContext } from '@/backend/ai/context/genkit.context';
+import { randomUUID } from 'crypto';
+import { verifyAuth } from '@/backend/auth/auth.middleware';
+import { aiRateLimiter } from '@/backend/security/rate-limiter';
+import { auditLogger } from '@/backend/security/audit-logger';
 // import { auth } from '@/backend/shared/infrastructure/auth';
 
 // Assuming some auth helper exists or we use currentUser from clerk/next-auth,
@@ -38,8 +43,24 @@ export type SubmitBudgetResult = {
 const budgetRepository = new BudgetRepositoryFirestore();
 
 export async function submitBudgetRequest(data: DetailedFormValues): Promise<SubmitBudgetResult> {
+    const authResult = await verifyAuth(false); // Optional auth for now, or true if strict
+    const userId = authResult?.userId || 'guest-' + randomUUID();
+    const userRole = authResult?.role || 'guest';
+
+    // 1. Rate Limiting
+    const isAllowed = await aiRateLimiter.isAllowed(userId);
+    if (!isAllowed) {
+        await auditLogger.log({
+            action: 'generate_budget_rate_limit',
+            userId,
+            status: 'failure',
+            details: { reason: 'Rate limit exceeded' }
+        });
+        return { success: false, message: 'Has excedido el límite de solicitudes. Por favor, espera un momento.' };
+    }
+
     try {
-        // 1. Validate Data on Server
+        // 2. Validate Data on Server
         const parsed = detailedFormSchema.safeParse(data);
         if (!parsed.success) {
             return { success: false, errors: parsed.error.flatten() };
@@ -47,7 +68,7 @@ export async function submitBudgetRequest(data: DetailedFormValues): Promise<Sub
 
         const validData = parsed.data;
 
-        // 2. Build Narrative
+        // 3. Build Narrative
         // Map form values to domain specs
         const specs = FormToSpecsMapper.map(validData);
         // Build narrative from specs
@@ -56,11 +77,28 @@ export async function submitBudgetRequest(data: DetailedFormValues): Promise<Sub
         console.log(narrative);
         console.log('----------------------------------');
 
-        // 3. Call AI Flow
+        // 4. Call AI Flow
         // Calls the orchestrator: Extraction -> Search -> Pricing
-        const budgetResult = await generateBudgetFlow({ userRequest: narrative });
+        // Wrap with Genkit Context to propagate Auth/Session
+        const budgetResult = await runWithContext({
+            userId,
+            role: userRole,
+            sessionId: 'session-' + Date.now(),
+            traceId: randomUUID()
+        }, async () => {
+            // Audit Start
+            await auditLogger.log({
+                action: 'generate_budget_start',
+                userId,
+                details: { narrativeShort: narrative.substring(0, 100) },
+                status: 'success'
+            });
 
-        // 4. Persist Budget
+            const result = await generateBudgetFlow({ userRequest: narrative });
+            return result;
+        });
+
+        // 5. Persist Budget
         const budgetId = generateId();
 
         // Create Client Snapshot
@@ -80,11 +118,24 @@ export async function submitBudgetRequest(data: DetailedFormValues): Promise<Sub
             updatedAt: new Date(),
             version: 1,
             specs, // Use the mapped specs
-            lineItems: budgetResult.lineItems.map((item, index) => ({
-                ...item,
-                id: generateId(), // Ensure items have IDs
-                isEditing: false
-            })),
+            chapters: (budgetResult as any).chapters?.map((c: any) => ({
+                id: c.id || generateId(),
+                name: c.name || "Partidas",
+                order: c.order || 0,
+                items: c.items.map((i: any) => ({ ...i, id: generateId(), type: 'PARTIDA' })),
+                totalPrice: c.totalPrice || 0
+            })) || [{
+                id: generateId(),
+                name: "Presupuesto Base",
+                order: 0,
+                items: (budgetResult as any).lineItems?.map((item: any) => ({
+                    ...item,
+                    type: 'PARTIDA',
+                    id: generateId(),
+                    isEditing: false
+                })) || [],
+                totalPrice: budgetResult.totalEstimated
+            }],
             costBreakdown: budgetResult.costBreakdown || {
                 materialExecutionPrice: 0,
                 overheadExpenses: 0,
@@ -105,7 +156,8 @@ export async function submitBudgetRequest(data: DetailedFormValues): Promise<Sub
             narrative,
             budgetResult: {
                 ...budgetResult,
-                id: budgetId // Return ID to client so we can redirect/edit if needed
+                id: budgetId, // Return ID to client so we can redirect/edit if needed
+                lineItems: newBudget.chapters.flatMap(c => c.items)
             }
         };
 

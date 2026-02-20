@@ -1,27 +1,22 @@
 import { z } from 'zod';
 import { ai } from '@/backend/ai/config/genkit.config';
 import { extractionFlow } from './extraction.flow';
-import { priceBookRetrieverTool } from '@/backend/ai/tools/price-book-retriever.tool';
+import { resolveItemFlow } from '@/backend/ai/agents/resolve-item.flow';
+import { validationAgent } from '@/backend/ai/agents/validation.agent';
 import { FirestoreBudgetConfigRepository } from '@/backend/budget/infrastructure/firestore-budget-config.repository';
-import { webPriceSearchTool } from '@/backend/ai/tools/web-price-search.tool';
-import { FirestorePendingPriceItemRepository } from '@/backend/budget/infrastructure/firestore-pending-item.repository';
 import { randomUUID } from 'crypto';
+import { BudgetPartida, BudgetMaterial, BudgetChapter } from '@/backend/budget/domain/budget';
+import { getCurrentContext } from '@/backend/ai/context/genkit.context';
 
-const BudgetLineItemSchema = z.object({
-    order: z.number(),
-    originalTask: z.string(),
-    found: z.boolean(),
-    isEstimate: z.boolean().optional(),
-    item: z.object({
-        code: z.string(),
-        description: z.string(),
-        unit: z.string(),
-        quantity: z.number(),
-        unitPrice: z.number(),
-        totalPrice: z.number(),
-    }).optional(),
-    note: z.string().optional(),
-});
+const BudgetChapterZodSchema = z.custom<BudgetChapter>();
+
+// Helper to remove undefined values for Firestore
+function sanitizeForFirestore(obj: any): any {
+    return JSON.parse(JSON.stringify(obj, (key, value) => {
+        if (value === undefined) return null; // Or omit
+        return value;
+    }));
+}
 
 export const generateBudgetFlow = ai.defineFlow(
     {
@@ -30,149 +25,112 @@ export const generateBudgetFlow = ai.defineFlow(
             userRequest: z.string(),
         }),
         outputSchema: z.object({
-            lineItems: z.array(BudgetLineItemSchema),
+            chapters: z.array(BudgetChapterZodSchema),
             costBreakdown: z.object({
-                materialExecutionPrice: z.number(), // PEM
-                overheadExpenses: z.number(), // Gastos Generales
-                industrialBenefit: z.number(), // Beneficio Industrial
-                tax: z.number(), // IVA
-                globalAdjustment: z.number(), // Ajuste Global
-                total: z.number(), // PEC (Presupuesto Ejecución por Contrata) + IVA
+                materialExecutionPrice: z.number(),
+                overheadExpenses: z.number(),
+                industrialBenefit: z.number(),
+                tax: z.number(),
+                globalAdjustment: z.number(),
+                total: z.number(),
             }),
-            totalEstimated: z.number(), // For backward/simple compatibility
+            totalEstimated: z.number(),
         }),
     },
     async (input) => {
-        // 0. Load Configuration & Repos
+        // 0. Load Configuration
         const configRepo = new FirestoreBudgetConfigRepository();
-        const pendingItemRepo = new FirestorePendingPriceItemRepository();
         const config = await configRepo.getConfig();
-        console.log(`[Flow] Loaded budget config: Adjustment=${config.globalAdjustmentFactor}, Margin=${config.industrialBenefit}`);
+        const ctx = getCurrentContext();
+        console.log(`[Flow] Budget Config: Adj=${config.globalAdjustmentFactor}, Margin=${config.industrialBenefit}`);
+        console.log(`[Flow] Execution Context: User=${ctx?.userId}, Role=${ctx?.role}`);
 
-        // 1. Extract Intents/Subtasks
+        // 1. Extract Intents
         console.log(">> 1. Extracting subtasks...");
         const extractionResult = await extractionFlow({ userRequest: input.userRequest });
-
-        if (!extractionResult?.subtasks) {
-            throw new Error("Could not extract tasks from request");
-        }
-
+        if (!extractionResult?.subtasks) throw new Error("Could not extract tasks");
         const subtasks = extractionResult.subtasks;
-        console.log(`>> Extracted ${subtasks.length} subtasks.`);
 
-        const lineItems = [];
-        let materialExecutionPrice = 0; // PEM
+        // Notification
+        if (ctx?.userId) {
+            const { emitGenerationEvent } = await import('@/backend/budget/events/budget-generation.emitter');
+            emitGenerationEvent(ctx.userId, 'subtasks_extracted', { count: subtasks.length, tasks: subtasks });
+        }
 
-        // 2. Search for each item
+        const lineItems: (BudgetPartida | BudgetMaterial)[] = [];
+        let materialExecutionPrice = 0;
+
+        // 2. Resolve each item via Agentic Orchestrator
+        // We run these sequentially to avoid rate limits, or parallel if robust
         for (let i = 0; i < subtasks.length; i++) {
-            const task = subtasks[i] as any; // Cast because extractionFlow types might not be inferred immediately
-            console.log(`>> 2.${i} Searching for: ${task.searchQuery}`);
+            const task = subtasks[i] as any;
+            console.log(`>> 2.${i} Resolving: ${task.searchQuery}`);
 
-            // A. Try Price Book
-            const searchResult = await priceBookRetrieverTool({ query: task.searchQuery, limit: 1, year: 2024 });
-            let bestMatch = searchResult.items && searchResult.items.length > 0 ? searchResult.items[0] : null;
-
-            // Validation: Keyword Check (Prevent Vector Hallucinations)
-            if (bestMatch) {
-                const queryWords = task.searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/\s+/).filter((w: string) => w.length > 3);
-                const descNormalized = bestMatch.description.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-                const hasMatch = queryWords.some((w: string) => descNormalized.includes(w));
-
-                if (!hasMatch && queryWords.length > 0) {
-                    console.log(`[Validation] Rejecting semantic match "${bestMatch.code}" for query "${task.searchQuery}". No keyword overlap.`);
-                    bestMatch = null; // Force fallback
-                }
-            }
-
-            if (bestMatch) {
-                const quantity = task.quantity || 1;
-                const totalPrice = bestMatch.priceTotal * quantity;
-
-                lineItems.push({
-                    order: i + 1,
-                    originalTask: `${task.searchQuery} (${quantity} ${task.unit})`,
-                    found: true,
-                    isEstimate: false,
-                    item: {
-                        code: bestMatch.code,
-                        description: bestMatch.description,
-                        unit: bestMatch.unit,
-                        quantity: quantity,
-                        unitPrice: bestMatch.priceTotal,
-                        totalPrice: totalPrice
-                    },
-                    note: `Linked to Price Book. ${quantity} x ${bestMatch.priceTotal}€`
+            try {
+                // Call the Orchestrator for this item
+                const resolvedItem = await resolveItemFlow({
+                    taskDescription: task.searchQuery,
+                    quantity: task.quantity || 1,
+                    unit: task.unit || 'u'
                 });
-                materialExecutionPrice += totalPrice;
-            } else {
-                // B. Fallback: Estimator Tool
-                console.log(`>> Item not found. Triggering Fallback Estimator for: ${task.searchQuery}`);
-                try {
-                    const fallback = await webPriceSearchTool({ query: task.searchQuery });
-                    const quantity = task.quantity || 1;
-                    const estimatedTotal = fallback.price * quantity;
-                    const pendingId = randomUUID();
 
-                    // Save to Pending Items for Admin Review
-                    await pendingItemRepo.create({
-                        id: pendingId,
-                        searchQuery: task.searchQuery,
-                        suggestedDescription: fallback.description,
-                        suggestedPrice: fallback.price,
-                        suggestedUnit: fallback.unit,
-                        sourceUrl: fallback.source,
-                        status: 'pending',
-                        createdAt: new Date()
-                    });
+                if (resolvedItem) {
+                    resolvedItem.order = i + 1;
+                    // Sanitize numeric values for Firestore
+                    resolvedItem.unitPrice = resolvedItem.unitPrice || 0;
+                    resolvedItem.totalPrice = resolvedItem.totalPrice || 0;
+                    resolvedItem.quantity = resolvedItem.quantity || 0;
 
-                    lineItems.push({
-                        order: i + 1,
-                        originalTask: `${task.searchQuery} (${quantity} ${task.unit})`,
-                        found: true, // It is "found" via fallback
-                        isEstimate: true, // Flag as estimate
-                        item: {
-                            code: `PENDING-${pendingId.substring(0, 6)}`,
-                            description: fallback.description,
-                            unit: fallback.unit,
-                            quantity: quantity,
-                            unitPrice: fallback.price,
-                            totalPrice: estimatedTotal
-                        },
-                        note: `⚠️ Estimado por IA (${fallback.source}). Pendiente validación.`
-                    });
-                    materialExecutionPrice += estimatedTotal;
-
-                } catch (err) {
-                    console.error("Fallback failed:", err);
-                    lineItems.push({
-                        order: i + 1,
-                        originalTask: task.searchQuery,
-                        found: false,
-                        note: "No se encontró precio ni estimación."
-                    });
+                    lineItems.push(resolvedItem);
+                    console.log(`   + Added Item: ${resolvedItem.description.substring(0, 30)}... | UnitPrice: ${resolvedItem.unitPrice} | Qty: ${resolvedItem.quantity} | Total: ${resolvedItem.totalPrice}`);
+                    materialExecutionPrice += resolvedItem.totalPrice;
                 }
+            } catch (err) {
+                console.error(`Failed to resolve item '${task.searchQuery}':`, err);
+                // Add error placeholder?
             }
         }
 
-        // 3. Apply Budget Logic (Structure Cost)
-        // PEM = Sum of items
+        // 3. Technical Validation (Async/Parallel)
+        // We don't block the user, but we log or store the advice
+        try {
+            console.log(">> 3. Validating technical coherence...");
+            const itemDescriptions = lineItems.map(i => i.description);
+            const validationResult = await validationAgent({ items: itemDescriptions });
+            console.log(`[Validation] Score: ${validationResult.overallScore}. Issues: ${validationResult.issues.length}`);
+            // TODO: Store warnings in Budget metadata
+        } catch (warn) {
+            console.warn("Validation agent warning:", warn);
+        }
+
+        // 4. Create Default Chapter
+        const defaultChapter: BudgetChapter = {
+            id: randomUUID(),
+            name: '01. Estimación Inicial (Agent V2)',
+            order: 1,
+            items: lineItems,
+            totalPrice: materialExecutionPrice
+        };
+
+        // 5. Apply Financial Logic
         const overheadExpenses = materialExecutionPrice * config.overheadExpenses;
         const industrialBenefit = materialExecutionPrice * config.industrialBenefit;
         const subtotal = materialExecutionPrice + overheadExpenses + industrialBenefit;
         const tax = subtotal * config.iva;
-
         let total = subtotal + tax;
 
-        // 4. Apply Global Adjustment Factor
+        // Global Adjustment
         const preAdjustment = total;
         total = total * config.globalAdjustmentFactor;
         const adjustmentAmount = total - preAdjustment;
 
-        console.log(`[Flow] Calculated: PEM=${materialExecutionPrice}, Total=${total}`);
+        if (ctx?.userId) {
+            const { emitGenerationEvent } = await import('@/backend/budget/events/budget-generation.emitter');
+            emitGenerationEvent(ctx.userId, 'complete', { total: total, itemCount: lineItems.length });
+        }
 
-        return {
-            lineItems,
+        const finalResult = {
+            chapters: [defaultChapter],
             costBreakdown: {
                 materialExecutionPrice,
                 overheadExpenses,
@@ -183,5 +141,7 @@ export const generateBudgetFlow = ai.defineFlow(
             },
             totalEstimated: total
         };
+
+        return sanitizeForFirestore(finalResult);
     }
 );

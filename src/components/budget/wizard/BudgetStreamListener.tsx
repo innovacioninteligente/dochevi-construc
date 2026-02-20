@@ -1,0 +1,175 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { useWidgetContext } from '@/context/budget-widget-context';
+import { sileo } from 'sileo';
+import { CheckCircle2, Hammer, Package, Search } from 'lucide-react';
+import { cn } from '@/lib/utils'; // Assuming you have this utility
+
+type GenerationEvent = {
+    type: 'subtasks_extracted' | 'item_resolving' | 'item_resolved' | 'validation_start' | 'complete' | 'error' |
+    'chapter_start' | 'decomposition_start' | 'vector_search';
+    leadId: string;
+    data: any;
+    timestamp: number;
+};
+
+export function BudgetStreamListener() {
+    const { leadId } = useWidgetContext();
+    const eventSourceRef = useRef<EventSource | null>(null);
+    const processedEvents = useRef<Set<number>>(new Set());
+
+    useEffect(() => {
+        if (!leadId) return;
+
+        // Close existing connection if any
+        if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+        }
+
+        const url = `/api/budget/stream?leadId=${leadId}`;
+        const es = new EventSource(url);
+        eventSourceRef.current = es;
+
+        es.onmessage = (event) => {
+            console.log("[BudgetStream] Raw event received:", event.data); // DEBUG
+            try {
+                const parsed: GenerationEvent = JSON.parse(event.data);
+                console.log("[BudgetStream] Parsed event:", parsed.type, parsed.data); // DEBUG
+
+                // Deduplicate events if needed (timestamp check)
+                if (processedEvents.current.has(parsed.timestamp)) {
+                    console.log("[BudgetStream] Duplicate event skipped:", parsed.timestamp); // DEBUG
+                    return;
+                }
+                processedEvents.current.add(parsed.timestamp);
+
+                handleGenerationEvent(parsed);
+            } catch (e) {
+                console.error("[BudgetStream] Parse error or heartbeat:", e); // DEBUG
+            }
+        };
+
+        es.onerror = (err) => {
+            console.error("[BudgetStream] Connection error:", err); // DEBUG
+        };
+
+        return () => {
+            es.close();
+        };
+    }, [leadId]);
+
+    return null; // Headless component
+}
+
+function handleGenerationEvent(event: GenerationEvent) {
+    switch (event.type) {
+        case 'subtasks_extracted':
+            sileo.info({
+                title: "Análisis Completado",
+                description: `Identificadas ${event.data.count} tareas constructivas.`,
+                duration: 4000,
+                icon: <Search className="text-blue-500" />
+            });
+            break;
+
+        case 'chapter_start':
+            sileo.info({
+                title: "Nuevo Capítulo",
+                description: `Procesando: ${event.data.name}`,
+                duration: 3000,
+                icon: <Package className="text-purple-500" />
+            });
+            break;
+
+        case 'decomposition_start':
+            // Optional: Maybe too noisy? Let's show it but shorter
+            /*
+            sileo.loading({
+                title: "Desglosando...",
+                description: event.data.description,
+                duration: 2000
+            });
+            */
+            break;
+
+        case 'vector_search':
+            // "Searching PriceBook..."
+            sileo.show({
+                title: "Consultando Precios",
+                description: `Buscando: "${event.data.query}"`,
+                duration: 2500,
+                position: 'bottom-right',
+                icon: <Search className="text-amber-500 animate-pulse" />
+            });
+            break;
+
+        case 'item_resolved':
+            const item = event.data.item;
+            const isMaterial = event.data.type === 'MATERIAL';
+
+            // Custom "Airline Ticket" style card for Sileo
+            const CustomCard = (
+                <div className="flex flex-col gap-2 min-w-[280px]">
+                    <div className="flex justify-between items-start">
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                            {isMaterial ? 'MATERIAL' : 'PARTIDA'}
+                        </span>
+                        <span className="text-xs font-mono text-emerald-500">
+                            {item.code || item.sku || 'N/A'}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 my-1">
+                        <div className={cn("p-2 rounded-lg", isMaterial ? "bg-amber-100 dark:bg-amber-900/30" : "bg-blue-100 dark:bg-blue-900/30")}>
+                            {isMaterial ? <Package className="h-5 w-5 text-amber-600" /> : <Hammer className="h-5 w-5 text-blue-600" />}
+                        </div>
+                        <div className="flex-1 leading-tight">
+                            <p className="font-semibold text-sm line-clamp-2 md:text-base">
+                                {item.description || item.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                                {item.quantity} {item.unit} • {formatCurrency(item.unitPrice)}/{item.unit}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2 border-t border-dashed border-gray-200 dark:border-white/10 mt-1">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-[10px] font-medium text-green-600 dark:text-green-400">
+                                {isMaterial ? 'En Stock' : 'Disponible'}
+                            </span>
+                        </div>
+                        <div className="bg-foreground text-background text-xs font-bold px-2 py-1 rounded-md">
+                            {formatCurrency(item.totalPrice)}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            sileo.show({
+                description: CustomCard,
+                duration: 5000,
+                position: 'bottom-right',
+                styles: {
+                    // Start of Selection
+                    // Override default styles if needed, mainly relying on the custom component
+                }
+            });
+            break;
+
+        case 'complete':
+            sileo.success({
+                title: "Presupuesto Generado",
+                description: `Generadas ${event.data.itemCount} partidas. Total: ${formatCurrency(event.data.total)}`,
+                duration: 6000,
+                icon: <CheckCircle2 className="text-green-500" />
+            });
+            break;
+    }
+}
+
+function formatCurrency(val: number) {
+    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(val);
+}
