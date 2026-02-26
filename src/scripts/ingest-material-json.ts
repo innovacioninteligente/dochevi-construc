@@ -17,7 +17,7 @@ import fs from 'fs';
 import { z } from 'zod';
 import { MaterialItem } from '@/backend/material-catalog/domain/material-item';
 import { FirestoreMaterialCatalogRepository } from '@/backend/material-catalog/infrastructure/firestore-material-catalog-repository';
-import { ai, embeddingModel } from '@/backend/ai/config/genkit.config';
+import { ai, embeddingModel } from '@/backend/ai/core/config/genkit.config';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 

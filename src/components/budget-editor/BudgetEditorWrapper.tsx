@@ -7,6 +7,8 @@ import { BudgetEditorToolbar } from './BudgetEditorToolbar';
 import { updateBudgetAction } from '@/actions/budget/update-budget.action';
 import { Budget } from '@/backend/budget/domain/budget';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { PersonalInfo } from '@/backend/lead/domain/lead';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BudgetRequestDetails } from './BudgetRequestDetails';
 import { BudgetEconomicSummary } from './BudgetEconomicSummary';
@@ -63,6 +65,26 @@ const BudgetEditorMain = ({ budget, isAdmin }: BudgetEditorWrapperProps) => {
 
     const sourceInfo = getSourceInfo(budget.source);
     const SourceIcon = sourceInfo.icon;
+    const router = useRouter();
+
+    // Handle Client Assignment
+    const handleAssignLead = async (leadId: string, clientSnapshot: PersonalInfo) => {
+        try {
+            const result = await updateBudgetAction(budget.id, {
+                leadId,
+                clientSnapshot
+            });
+
+            if (result.success) {
+                router.refresh(); // Refresh Sever Components to get the newly assigned budget entity
+            } else {
+                throw new Error(result.error || "No se pudo actualizar");
+            }
+        } catch (error) {
+            console.error("Assign Lead Error:", error);
+            throw error;
+        }
+    };
 
     // Handle Save
     const handleSave = async () => {
@@ -90,9 +112,11 @@ const BudgetEditorMain = ({ budget, isAdmin }: BudgetEditorWrapperProps) => {
 
                         originalTask: editorItem.originalTask,
                         breakdown: editorItem.item?.breakdown, // <--- Key for AI Persistence
+                        matchedItem: editorItem.item?.matchedItem, // <--- Preserve origin tracking
                         note: editorItem.item?.note,
                         isRealCost: editorItem.item?.isRealCost,
-                        matchConfidence: editorItem.item?.matchConfidence
+                        matchConfidence: editorItem.item?.matchConfidence,
+                        candidates: editorItem.item?.candidates // Preserve candidates on save
                     };
                 });
 
@@ -154,6 +178,9 @@ const BudgetEditorMain = ({ budget, isAdmin }: BudgetEditorWrapperProps) => {
                 showGhostMode={isGhostMode}
                 onToggleGhostMode={() => setIsGhostMode(!isGhostMode)}
                 onAddItem={addItem}
+                currentLeadId={budget.leadId}
+                currentClientName={budget.clientSnapshot?.name}
+                onAssignLead={handleAssignLead}
             />
 
             <main className="flex-1 w-full p-4 md:p-6 space-y-6 md:space-y-8 animate-in fade-in duration-500 pb-24 md:pb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20">
@@ -163,12 +190,19 @@ const BudgetEditorMain = ({ budget, isAdmin }: BudgetEditorWrapperProps) => {
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-6 pb-2">
                         {/* ... existing header code ... */}
                         <div className="space-y-2">
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 ${sourceInfo.color} font-medium tracking-wide`}>
                                     <SourceIcon className="w-3.5 h-3.5" />
                                     {sourceInfo.label}
                                 </Badge>
-                                <span className="text-xs font-mono text-muted-foreground">#{budget.id.substring(0, 8).toUpperCase()}</span>
+
+                                {['wizard', 'pdf_measurement'].includes(budget.source || '') && (
+                                    <Badge variant="outline" className="gap-1.5 px-2.5 py-1 bg-red-500/10 text-red-700 border-red-200 dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 font-medium tracking-wide animate-pulse">
+                                        ⚠️ Borrador IA (Revisar Fases y Precios)
+                                    </Badge>
+                                )}
+
+                                <span className="text-xs font-mono text-muted-foreground ml-auto md:ml-0">#{budget.id.substring(0, 8).toUpperCase()}</span>
                             </div>
 
                             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight font-headline text-foreground">
@@ -328,6 +362,14 @@ export const BudgetEditorWrapper = ({ budget, isAdmin = false }: BudgetEditorWra
                 // Explicitly copy breakdown if it exists in domain item
                 if (legacy.item && (i as any).breakdown) {
                     legacy.item.breakdown = (i as any).breakdown;
+                }
+                // Explicitly copy matchedItem for HITL tracking
+                if (legacy.item && (i as any).matchedItem) {
+                    legacy.item.matchedItem = (i as any).matchedItem;
+                }
+                // Explicitly copy candidates for HITL tracking
+                if (legacy.item && (i as any).candidates) {
+                    legacy.item.candidates = (i as any).candidates;
                 }
                 return legacy;
             }));

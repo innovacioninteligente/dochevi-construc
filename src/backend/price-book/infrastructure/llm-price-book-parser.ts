@@ -1,6 +1,6 @@
 
 import { z } from 'zod';
-import { ai, gemini25Flash } from '@/backend/ai/config/genkit.config';
+import { ai, gemini25Flash } from '@/backend/ai/core/config/genkit.config';
 import { PriceBookItem } from '../domain/price-book-item';
 import { createRequire } from 'module';
 

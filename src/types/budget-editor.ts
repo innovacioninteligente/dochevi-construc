@@ -23,6 +23,8 @@ export interface EditableBudgetLineItem {
         breakdown?: BudgetBreakdownComponent[];
         isRealCost?: boolean;
         note?: string; // New field for analyst notes
+        matchedItem?: any; // Retains the DB JSON matching text for HITL comparison
+        candidates?: any[]; // Retains top 3 DB matches for HITL selection
     };
 
     // Editor State

@@ -1,9 +1,9 @@
 'use server';
 
-import { generateRenderFlow } from '@/backend/ai/flows/renovation/generate-render.flow';
+import { generateRenderFlow } from '@/backend/ai/private/flows/renovation/generate-render.flow';
 
 interface GenerateRenovationParams {
-    imageBuffer: string; // Base64 input from client
+    imageBuffers: string[]; // Base64 input array from client
     style: string;
     roomType: string;
     budgetId: string;
@@ -11,7 +11,7 @@ interface GenerateRenovationParams {
 }
 
 export async function generateRenovationAction({
-    imageBuffer,
+    imageBuffers,
     style,
     roomType,
     budgetId,
@@ -20,7 +20,7 @@ export async function generateRenovationAction({
     try {
         // 1. Call AI Flow
         const result = await generateRenderFlow({
-            imageBuffer,
+            imageBuffers,
             style,
             roomType,
             additionalRequirements

@@ -12,6 +12,7 @@ import { EditableBudgetLineItem } from '@/types/budget-editor';
 import { searchPriceBookAction } from '@/actions/price-book/search-items.action';
 import { PriceBookItem } from '@/backend/price-book/domain/price-book-item';
 import { useToast } from '@/hooks/use-toast';
+import { formatMoneyEUR } from '@/lib/utils';
 
 interface BudgetLibrarySidebarProps {
     onAddItem: (item: Partial<EditableBudgetLineItem>) => void;
@@ -145,7 +146,7 @@ export const BudgetLibrarySidebar = ({ onAddItem }: BudgetLibrarySidebarProps) =
                                         </h4>
                                     </div>
                                     <span className="font-mono text-xs font-bold text-slate-600 dark:text-white/90 bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded whitespace-nowrap">
-                                        {item.priceTotal.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                                        {formatMoneyEUR(item.priceTotal)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-end mt-1 opacity-0 group-hover:opacity-100 transition-opacity">

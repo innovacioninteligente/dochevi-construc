@@ -26,7 +26,7 @@ export function DashboardLayout({ children, t }: { children: React.ReactNode, t:
   const isAppPage = pathname.includes('/admin/messages') ||
     pathname.includes('/wizard') ||
     pathname.includes('/projects') ||
-    pathname.includes('/budgets') ||
+    (pathname.includes('/budgets') && pathname.includes('/edit')) ||
     pathname.includes('/presupuesto');
 
   const [mounted, setMounted] = React.useState(false);

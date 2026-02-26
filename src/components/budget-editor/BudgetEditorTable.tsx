@@ -44,7 +44,7 @@ import {
     Loader2
 } from "lucide-react";
 import { Reorder, useDragControls } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, formatMoneyEUR } from "@/lib/utils";
 import { EditableBudgetLineItem } from "@/types/budget-editor";
 import { EditableCell } from "./EditableCell";
 import { sileo } from 'sileo';
@@ -262,7 +262,7 @@ const TableRowItem = ({ item, onUpdate, onRemove, onDuplicate, showGhostMode, on
                     />
                     {showGhostMode && item.originalState && (
                         <div className="absolute -bottom-4 right-2 text-[10px] text-slate-400 line-through">
-                            {item.originalState.unitPrice.toFixed(2)}€
+                            {formatMoneyEUR(item.originalState.unitPrice)}
                         </div>
                     )}
                 </div>
@@ -387,7 +387,7 @@ const ChapterSection = ({
 
                             <div className="flex items-center gap-4">
                                 <span className="font-mono font-bold text-slate-700 dark:text-white">
-                                    {totalChapter.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                                    {formatMoneyEUR(totalChapter)}
                                 </span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -459,6 +459,70 @@ export function BudgetEditorTable({
         setBreakdownOpen(true);
     };
 
+    const handleSwapMatch = (itemToSwap: EditableBudgetLineItem, newMatch: any) => {
+        const newItemState = {
+            ...itemToSwap.item!,
+            unitPrice: newMatch.price,
+            description: newMatch.description,
+            unit: newMatch.unit || itemToSwap.item?.unit || 'ud',
+            code: newMatch.code,
+            totalPrice: newMatch.price * (itemToSwap.item?.quantity || 1),
+            breakdown: newMatch.breakdown || [],
+            matchedItem: newMatch,
+        };
+        const newType = newMatch.type === 'MATERIAL' ? 'MATERIAL' : 'PARTIDA';
+
+        onUpdate(itemToSwap.id, {
+            item: newItemState,
+            type: newType,
+            isDirty: true
+        });
+
+        // Update the active sheet view
+        setBreakdownItem({
+            ...itemToSwap,
+            item: newItemState,
+            type: newType
+        });
+    };
+
+    const handleAddMaterialToBreakdown = (itemTarget: EditableBudgetLineItem, materialToAdd: any) => {
+        const currentBreakdown = itemTarget.item?.breakdown || [];
+        const newComponent = {
+            code: materialToAdd.code,
+            description: materialToAdd.name,
+            unit: materialToAdd.unit,
+            quantity: 1, // Default quantity
+            price: materialToAdd.price,
+            total: materialToAdd.price
+        };
+        const newBreakdown = [...currentBreakdown, newComponent];
+
+        const newUnitPrice = newBreakdown.reduce((acc, comp) => {
+            const y = comp.quantity ?? (comp as any).yield ?? 1;
+            const isPct = comp.unit === '%' || comp.code === '%';
+            const t = comp.total ?? (isPct ? (comp.price * (y / 100)) : (comp.price * y));
+            return acc + t;
+        }, 0);
+
+        const newItemState = {
+            ...itemTarget.item!,
+            breakdown: newBreakdown,
+            unitPrice: newUnitPrice,
+            totalPrice: newUnitPrice * (itemTarget.item?.quantity || 1)
+        };
+
+        onUpdate(itemTarget.id, {
+            item: newItemState,
+            isDirty: true
+        });
+
+        setBreakdownItem({
+            ...itemTarget,
+            item: newItemState,
+        });
+    };
+
     return (
         <div className="w-full bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden">
             <Table>
@@ -507,6 +571,8 @@ export function BudgetEditorTable({
                 item={breakdownItem}
                 open={breakdownOpen}
                 onOpenChange={setBreakdownOpen}
+                onSwapMatch={handleSwapMatch}
+                onAddMaterial={handleAddMaterialToBreakdown}
             />
         </div>
     );

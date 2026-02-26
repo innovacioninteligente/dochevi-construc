@@ -1,6 +1,6 @@
 'use server';
 
-import { ai, embeddingModel } from '@/backend/ai/config/genkit.config';
+import { ai, embeddingModel } from '@/backend/ai/core/config/genkit.config';
 import { FirestorePriceBookRepository } from '@/backend/price-book/infrastructure/firestore-price-book-repository';
 import { FirestorePendingPriceItemRepository } from '@/backend/budget/infrastructure/firestore-pending-item.repository';
 import { PendingPriceItem } from '@/backend/budget/domain/pending-price-item';

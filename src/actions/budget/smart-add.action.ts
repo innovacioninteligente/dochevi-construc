@@ -1,7 +1,7 @@
 'use server';
 
-import { extractionFlow } from '@/backend/ai/flows/budget/extraction.flow';
-import { priceBookRetrieverTool } from '@/backend/ai/tools/price-book-retriever.tool';
+import { extractionFlow } from '@/backend/ai/private/flows/budget/extraction.flow';
+import { priceBookRetrieverTool } from '@/backend/ai/core/tools/price-book-retriever.tool';
 import { EditableBudgetLineItem } from '@/types/budget-editor';
 import { v4 as uuidv4 } from 'uuid';
 

@@ -40,7 +40,7 @@ async function ingestPriceBook() {
 
         const items = data.items;
         const totalItems = items.length;
-        const batchSize = 400; // Firestore batch limit is 500
+        const batchSize = 50; // Lowered from 400 to avoid "Transaction too big" with complex breakdowns
         let processedCount = 0;
 
         // Process in chunks

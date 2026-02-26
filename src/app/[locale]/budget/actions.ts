@@ -3,10 +3,10 @@
 import { DetailedFormValues, detailedFormSchema } from '@/components/budget-request/schema';
 import { BudgetNarrativeBuilder } from '@/backend/budget/domain/budget-narrative-builder';
 import { FormToSpecsMapper } from '@/backend/budget/application/mappers/form-to-specs.mapper';
-import { generateBudgetFlow } from '@/backend/ai/flows/budget/generate-budget.flow';
+import { generateBudgetFlow } from '@/backend/ai/private/flows/budget/generate-budget.flow';
 import { BudgetRepositoryFirestore } from '@/backend/budget/infrastructure/budget-repository-firestore';
 import { Budget } from '@/backend/budget/domain/budget';
-import { runWithContext } from '@/backend/ai/context/genkit.context';
+import { runWithContext } from '@/backend/ai/core/context/genkit.context';
 import { randomUUID } from 'crypto';
 import { verifyAuth } from '@/backend/auth/auth.middleware';
 import { aiRateLimiter } from '@/backend/security/rate-limiter';

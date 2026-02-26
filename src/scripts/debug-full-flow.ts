@@ -35,7 +35,7 @@ async function runStressTest() {
     console.log("🚀 Starting Full Scale Stress Test: 'Luxury House 300m2'...");
 
     // Dynamic imports to ensure env vars are loaded first
-    const { generateBudgetFlow } = await import('@/backend/ai/flows/budget/generate-budget.flow');
+    const { generateBudgetFlow } = await import('@/backend/ai/private/flows/budget/generate-budget.flow');
     const { BudgetRepositoryFirestore } = await import('@/backend/budget/infrastructure/budget-repository-firestore');
 
     if (!process.env.GOOGLE_GENAI_API_KEY) {

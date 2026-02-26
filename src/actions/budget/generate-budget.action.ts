@@ -1,7 +1,7 @@
 'use server';
 
 import { BudgetNarrativeBuilder } from '@/backend/budget/domain/budget-narrative-builder';
-import { generateBudgetFlow } from '@/backend/ai/flows/budget/generate-budget.flow';
+import { generateBudgetFlow } from '@/backend/ai/private/flows/budget/generate-budget.flow';
 import { BudgetRepositoryFirestore } from '@/backend/budget/infrastructure/budget-repository-firestore';
 import { FirestoreLeadRepository } from '@/backend/lead/infrastructure/firestore-lead-repository';
 import { Budget } from '@/backend/budget/domain/budget';

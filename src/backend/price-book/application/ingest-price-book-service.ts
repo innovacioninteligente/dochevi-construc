@@ -2,7 +2,7 @@
 import { PriceBookRepository } from '../domain/price-book-repository';
 import { LLMPriceBookParser } from '../infrastructure/llm-price-book-parser';
 import { IngestionJobRepository } from '../domain/ingestion-job-repository';
-import { ai, embeddingModel } from '@/backend/ai/config/genkit.config';
+import { ai, embeddingModel } from '@/backend/ai/core/config/genkit.config';
 import { PriceBookItem } from '../domain/price-book-item';
 
 /**

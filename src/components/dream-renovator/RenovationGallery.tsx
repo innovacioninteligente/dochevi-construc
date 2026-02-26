@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Wand2, Upload, ImageIcon } from 'lucide-react';
+import { Loader2, Wand2, Upload, ImageIcon, Plus } from 'lucide-react';
 import { generateRenovationAction } from '@/actions/ai/generate-renovation.action';
 import Image from 'next/image';
 
@@ -27,9 +27,9 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
     const { toast } = useToast();
     const router = useRouter();
     const [isGenerating, setIsGenerating] = useState(false);
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-    const [viewingImage, setViewingImage] = useState<{ url: string, originalUrl?: string, title: string } | null>(null);
+    const [selectedImages, setSelectedImages] = useState<string[]>([]);
+    const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+    const [viewingImage, setViewingImage] = useState<{ url: string, beforeUrls?: string[], originalUrl?: string, title: string } | null>(null);
 
     // Form States
     const [roomType, setRoomType] = useState('Salón');
@@ -37,25 +37,28 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
     const [requirements, setRequirements] = useState('');
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setSelectedImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+        const files = Array.from(e.target.files || []);
+        if (files.length > 0) {
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setSelectedImages(prev => [...prev, reader.result as string]);
+                };
+                reader.readAsDataURL(file);
+            });
         }
     };
 
     const handleGenerate = async () => {
-        if (!selectedImage) return;
+        if (selectedImages.length === 0) return;
 
         setIsGenerating(true);
         try {
             // 1. Generate Image (Server Action returns Base64)
-            const base64Data = selectedImage.split(',')[1];
+            // Send all images. Remove 'data:image/x;base64,' prefix for action
+            const base64DataArray = selectedImages.map(img => img.split(',')[1]);
             const result = await generateRenovationAction({
-                imageBuffer: base64Data,
+                imageBuffers: base64DataArray,
                 roomType,
                 style,
                 additionalRequirements: requirements,
@@ -78,15 +81,18 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
 
             const timestamp = Date.now();
 
-            // Upload Original
-            const originalRef = ref(storage, `renders/${budgetId}/${timestamp}_original.jpg`);
-            await uploadString(originalRef, selectedImage, 'data_url');
-            const originalUrl = await getDownloadURL(originalRef);
+            // Upload Originals
+            const originalUrls: string[] = [];
+            for (let i = 0; i < selectedImages.length; i++) {
+                const originalRef = ref(storage, `renders/${budgetId}/${timestamp}_original_${i}.jpg`);
+                await uploadString(originalRef, selectedImages[i], 'data_url');
+                const url = await getDownloadURL(originalRef);
+                originalUrls.push(url);
+            }
 
             // Upload Generated
+            // For now, the flow generates a single After image summarizing the prompt, but returning mapping to the domain
             const generatedRef = ref(storage, `renders/${budgetId}/${timestamp}_${style}.png`);
-            // result.base64 is raw base64, need to prepend data url prefix if using uploadString with 'data_url', 
-            // OR use 'base64' format. The action returns raw base64.
             await uploadString(generatedRef, result.base64, 'base64', { contentType: 'image/png' });
             const generatedUrl = await getDownloadURL(generatedRef);
 
@@ -96,8 +102,8 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
                 budgetId,
                 render: {
                     id: `${timestamp}`,
-                    url: generatedUrl,
-                    originalUrl: originalUrl,
+                    afterUrls: [generatedUrl],
+                    beforeUrls: originalUrls,
                     prompt: requirements || `Renovación estilo ${style}`,
                     style,
                     roomType
@@ -105,7 +111,7 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
             });
 
             if (saveResult.success) {
-                setGeneratedImage(generatedUrl);
+                setGeneratedImages([generatedUrl]);
                 toast({
                     title: "¡Transformación Completa!",
                     description: "La imagen se ha guardado en la galería del presupuesto.",
@@ -149,26 +155,30 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label>1. Sube la foto actual (&quot;Antes&quot;)</Label>
-                                <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 transition-colors relative">
+                                <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors relative">
                                     <Input
                                         type="file"
                                         accept="image/*"
-                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                        multiple
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                         onChange={handleImageUpload}
                                     />
-                                    {selectedImage ? (
-                                        <div className="relative w-full aspect-video rounded-md overflow-hidden">
-                                            <Image
-                                                src={selectedImage}
-                                                alt="Original"
-                                                fill
-                                                className="object-cover"
-                                            />
+                                    {selectedImages.length > 0 ? (
+                                        <div className="w-full flex gap-2 overflow-x-auto pb-2 relative z-20">
+                                            {selectedImages.map((img, idx) => (
+                                                <div key={idx} className="relative w-24 h-24 shrink-0 rounded-md overflow-hidden border">
+                                                    <Image src={img} alt={`Original ${idx}`} fill className="object-cover" />
+                                                </div>
+                                            ))}
+                                            <div className="w-24 h-24 shrink-0 rounded-md border-2 border-dashed flex flex-col items-center justify-center relative hover:bg-slate-100 cursor-pointer">
+                                                <Input type="file" accept="image/*" multiple className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleImageUpload} />
+                                                <Plus className="h-6 w-6 text-slate-400" />
+                                            </div>
                                         </div>
                                     ) : (
                                         <>
-                                            <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                                            <span className="text-sm text-slate-500">Haz clic para subir imagen</span>
+                                            <Upload className="h-8 w-8 text-slate-400 mb-2 pointer-events-none" />
+                                            <span className="text-sm text-slate-500 pointer-events-none">Sube una o varias fotos de la estancia</span>
                                         </>
                                     )}
                                 </div>
@@ -218,7 +228,7 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
 
                             <Button
                                 className="w-full bg-purple-600 hover:bg-purple-700"
-                                disabled={!selectedImage || isGenerating}
+                                disabled={selectedImages.length === 0 || isGenerating}
                                 onClick={handleGenerate}
                             >
                                 {isGenerating ? (
@@ -239,20 +249,20 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
                         <div className="space-y-4">
                             <Label>Resultado (&quot;Después&quot;)</Label>
                             <div className="w-full aspect-video bg-slate-100 rounded-lg flex items-center justify-center border overflow-hidden relative group">
-                                {generatedImage ? (
+                                {generatedImages.length > 0 ? (
                                     <>
-                                        {/* For external URLs we need Next.js config allowed domains, or use standard img tag if simpler for now */}
+                                        {/* Show first generated image for preview */}
                                         <img
-                                            src={generatedImage}
+                                            src={generatedImages[0]}
                                             alt="Renovación Generada"
                                             className="w-full h-full object-cover"
                                         />
                                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                            <Button variant="secondary" size="sm" onClick={() => setViewingImage({ url: generatedImage, title: 'Resultado Generado' })}>
+                                            <Button variant="secondary" size="sm" onClick={() => setViewingImage({ url: generatedImages[0], beforeUrls: selectedImages, title: 'Resultado Generado' })}>
                                                 Ampliar
                                             </Button>
-                                            <Button variant="secondary" size="sm" onClick={() => window.open(generatedImage, '_blank')}>
-                                                Descargar / Pestaña
+                                            <Button variant="secondary" size="sm" onClick={() => window.open(generatedImages[0], '_blank')}>
+                                                Descargar
                                             </Button>
                                         </div>
                                     </>
@@ -277,27 +287,27 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
                             <Card key={render.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
                                 <div className="relative aspect-video">
                                     <Image
-                                        src={render.url}
+                                        src={render.afterUrls[0]}
                                         alt={render.prompt}
                                         fill
                                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
-                                    <div className="absolute top-2 left-2 flex gap-2">
-                                        <span className="bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                                    <div className="absolute top-2 left-2 flex gap-2 w-[calc(100%-16px)] flex-wrap">
+                                        <span className="bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm truncate max-w-[120px]">
                                             {render.roomType}
                                         </span>
-                                        <span className="bg-purple-600/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                                        <span className="bg-purple-600/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm truncate max-w-[120px]">
                                             {render.style}
                                         </span>
                                     </div>
                                     {/* Action Text/Overlay */}
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                                         <Button
                                             variant="secondary"
                                             size="sm"
                                             onClick={() => setViewingImage({
-                                                url: render.url,
-                                                originalUrl: render.originalUrl,
+                                                url: render.afterUrls[0],
+                                                beforeUrls: render.beforeUrls,
                                                 title: `Resultado: ${render.style} - ${render.roomType}`
                                             })}
                                         >
@@ -325,12 +335,19 @@ export function RenovationGallery({ budgetId, renders = [] }: RenovationGalleryP
                     <DialogHeader className="absolute top-0 left-0 right-0 z-10 bg-black/50 backdrop-blur-sm p-4 text-white">
                         <DialogTitle>{viewingImage?.title}</DialogTitle>
                     </DialogHeader>
-                    {viewingImage && viewingImage.originalUrl ? (
-                        <ImageComparisonSlider
-                            beforeImage={viewingImage.originalUrl}
-                            afterImage={viewingImage.url}
-                            className="w-full h-[80vh]"
-                        />
+                    {viewingImage && viewingImage.beforeUrls && viewingImage.beforeUrls.length > 0 ? (
+                        <div className="flex flex-col relative w-full h-[80vh]">
+                            <ImageComparisonSlider
+                                beforeImage={viewingImage.beforeUrls[0]}
+                                afterImage={viewingImage.url}
+                                className="w-full flex-1"
+                            />
+                            {viewingImage.beforeUrls.length > 1 && (
+                                <div className="absolute bottom-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded-md">
+                                    + {viewingImage.beforeUrls.length - 1} fotos previas
+                                </div>
+                            )}
+                        </div>
                     ) : viewingImage && (
                         <div className="relative w-full h-[80vh]">
                             <Image

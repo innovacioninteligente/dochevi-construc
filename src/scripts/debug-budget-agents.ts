@@ -3,9 +3,9 @@ config({ path: '.env.local' });
 config();
 
 // Agents will be imported dynamically after dotenv config
-// import { budgetSearchAgent } from '@/backend/ai/agents/budget-search.agent';
-// import { triageAgent } from '@/backend/ai/agents/triage.agent';
-// import { resolveItemFlow } from '@/backend/ai/agents/resolve-item.flow';
+// import { budgetSearchAgent } from '@/backend/ai/private/agents/budget-search.agent';
+// import { triageAgent } from '@/backend/ai/public/agents/triage.agent';
+// import { resolveItemFlow } from '@/backend/ai/private/flows/resolve-item.flow';
 
 const TEST_CASES = [
     {
@@ -33,9 +33,9 @@ async function runDebug() {
     console.log("GENAI_API_KEY present:", !!process.env.GOOGLE_GENAI_API_KEY);
 
     // Dynamic Import to respect dotenv
-    const { triageAgent } = await import('@/backend/ai/agents/triage.agent');
-    const { budgetSearchAgent } = await import('@/backend/ai/agents/budget-search.agent');
-    const { priceBookRetrieverTool } = await import('@/backend/ai/tools/price-book-retriever.tool');
+    const { triageAgent } = await import('@/backend/ai/public/agents/triage.agent');
+    const { budgetSearchAgent } = await import('@/backend/ai/private/agents/budget-search.agent');
+    const { priceBookRetrieverTool } = await import('@/backend/ai/core/tools/price-book-retriever.tool');
 
     console.log("\n🧪 MANUAL PB TEST 1: 'Pavimento porcelánico'");
     const pbTest1 = await priceBookRetrieverTool({ query: 'Pavimento porcelánico', limit: 1, year: 2024 });

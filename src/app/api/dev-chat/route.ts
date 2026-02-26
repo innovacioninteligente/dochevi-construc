@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clientRequirementsFlow } from '@/backend/ai/flows/client-requirements.flow';
-import { generateBudgetFlow } from '@/backend/ai/flows/budget/generate-budget.flow';
+import { clientRequirementsFlow } from '@/backend/ai/public/flows/client-requirements.flow';
+import { generateBudgetFlow } from '@/backend/ai/private/flows/budget/generate-budget.flow';
 import { BudgetNarrativeBuilder } from '@/backend/budget/domain/budget-narrative-builder';
 import { DetailedFormValues } from '@/components/budget-request/schema';
 

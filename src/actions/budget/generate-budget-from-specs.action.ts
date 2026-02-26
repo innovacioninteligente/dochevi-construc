@@ -1,7 +1,7 @@
 'use server';
 
 import { BudgetNarrativeBuilder } from '@/backend/budget/domain/budget-narrative-builder';
-import { generateBudgetFlow } from '@/backend/ai/flows/budget/generate-budget.flow';
+import { generateBudgetFlow } from '@/backend/ai/private/flows/budget/generate-budget.flow';
 import { BudgetRepositoryFirestore } from '@/backend/budget/infrastructure/budget-repository-firestore';
 import { FirestoreLeadRepository } from '@/backend/lead/infrastructure/firestore-lead-repository';
 import { Budget } from '@/backend/budget/domain/budget';
@@ -12,7 +12,7 @@ const budgetRepository = new BudgetRepositoryFirestore();
 const leadRepository = new FirestoreLeadRepository();
 
 // ... imports
-import { generateBudgetRecurseFlow } from '@/backend/ai/agents/generate-budget-recurse.flow';
+import { generateBudgetRecurseFlow } from '@/backend/ai/private/flows/generate-budget-recurse.flow';
 
 // ... (previous code)
 

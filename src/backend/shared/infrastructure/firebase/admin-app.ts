@@ -31,3 +31,10 @@ export function initFirebaseAdminApp(): App {
 export const adminApp = initFirebaseAdminApp();
 export const adminAuth = getAuth(adminApp);
 export const adminFirestore = getFirestore(adminApp);
+
+// Configure Firestore to ignore undefined properties to prevent crashes on generic AI extractions
+try {
+    adminFirestore.settings({ ignoreUndefinedProperties: true });
+} catch (e) {
+    // Ignore if already configured
+}

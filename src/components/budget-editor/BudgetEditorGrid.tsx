@@ -19,7 +19,7 @@ import {
     Package,
     Hammer
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatMoneyEUR } from '@/lib/utils';
 import { useState } from 'react';
 import {
     DropdownMenu,
@@ -151,7 +151,7 @@ const DraggableRow = ({ item, onUpdate, onRemove, onDuplicate, showGhostMode }: 
                 <div className="flex items-center gap-4">
                     {showGhostMode && item.originalState && (
                         <span className="text-xs text-slate-400 line-through font-mono">
-                            {(item.originalState.quantity * item.originalState.unitPrice).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                            {formatMoneyEUR(item.originalState.quantity * item.originalState.unitPrice)}
                         </span>
                     )}
 
@@ -389,7 +389,7 @@ const DraggableRow = ({ item, onUpdate, onRemove, onDuplicate, showGhostMode }: 
                         isRealCost={item.item.isRealCost}
                         note={item.item.note}
                         onBreakdownChange={(newBreakdown) => {
-                            const newUnitPrice = newBreakdown.reduce((acc, c) => acc + c.total, 0);
+                            const newUnitPrice = newBreakdown.reduce((acc, c) => acc + (c.total || 0), 0);
                             const quantity = item.item?.quantity || 1;
                             onUpdate(item.id, {
                                 item: {
@@ -494,7 +494,7 @@ const ChapterGroup = ({
 
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-slate-500 mr-4">
-                        {(items.reduce((acc, i) => acc + (i.item?.totalPrice || 0), 0)).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                        {formatMoneyEUR(items.reduce((acc, i) => acc + (i.item?.totalPrice || 0), 0))}
                     </span>
 
                     <DropdownMenu>

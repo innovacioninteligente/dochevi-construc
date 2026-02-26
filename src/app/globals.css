@@ -201,3 +201,13 @@
     text-wrap: balance;
   }
 }
+
+/* Sileo Toast Overrides — force readable text on light toast backgrounds */
+[data-sileo-toaster] [data-sileo-toast] {
+  color: #1a1a1a !important;
+}
+
+[data-sileo-toaster] [data-sileo-toast] [data-title],
+[data-sileo-toaster] [data-sileo-toast] [data-description] {
+  color: #1a1a1a !important;
+}

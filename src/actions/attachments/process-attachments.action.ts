@@ -1,6 +1,6 @@
 'use server';
 
-import { analyzeAttachmentsFlow } from '@/backend/ai/flows/analyze-attachments.flow';
+import { analyzeAttachmentsFlow } from '@/backend/ai/public/flows/analyze-attachments.flow';
 
 export async function processAttachmentsAction(formData: FormData) {
     try {

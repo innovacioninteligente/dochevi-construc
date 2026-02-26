@@ -12,7 +12,7 @@ export type Message = {
 
 export type WizardState = 'idle' | 'listening' | 'processing' | 'generating' | 'review';
 
-export const useBudgetWizard = () => {
+export const useBudgetWizard = (mode: 'public' | 'private' = 'public') => {
     const { leadId } = useWidgetContext();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
@@ -62,9 +62,8 @@ export const useBudgetWizard = () => {
         loadHistory();
     }, [leadId]);
 
-
-    const sendMessage = async (text: string, attachments: string[] = [], llmTextOverride?: string) => {
-        if ((!text.trim() && attachments.length === 0) || !conversationId || !leadId) return;
+    const sendMessage = async (text: string, attachments: string[] = [], base64Files?: string[], llmTextOverride?: string) => {
+        if ((!text.trim() && attachments.length === 0 && (!base64Files || base64Files.length === 0)) || !conversationId || !leadId) return;
 
         // Optimistic Update
         const tempId = Date.now().toString();
@@ -86,7 +85,7 @@ export const useBudgetWizard = () => {
             await sendMessageAction(conversationId, text, 'lead', leadId, attachments);
 
             // 2. Process AI Response
-            await processAIResponse(llmTextOverride || text, attachments);
+            await processAIResponse(llmTextOverride || text, base64Files);
 
         } catch (error) {
             console.error("Failed to send message:", error);
@@ -105,7 +104,7 @@ export const useBudgetWizard = () => {
         await processAIResponse(context, [], true);
     };
 
-    const processAIResponse = async (text: string, attachments: string[] = [], isHidden: boolean = false) => {
+    const processAIResponse = async (text: string, base64Files?: string[], isHidden: boolean = false) => {
         if (!conversationId) return;
 
         try {
@@ -114,30 +113,37 @@ export const useBudgetWizard = () => {
                 content: [{ text: m.content }]
             }));
 
-            // Add current message to history if it wasn't added yet (for hidden ones)
-            // Actually, processClientMessageAction expects history EXCLUDING current message typically,
-            // or including it. Let's check the flow. 
-            // Usually we send history + current prompt.
+            let result;
 
-            const { processClientMessageAction } = await import('@/actions/budget/process-client-message.action');
-            const result = await processClientMessageAction(text, history, requirements);
+            if (mode === 'public') {
+                const { processPublicChatAction } = await import('@/actions/chat/process-public-chat.action');
+                result = await processPublicChatAction(text, history, base64Files, leadId ?? undefined);
+            } else {
+                const { processPrivateChatAction } = await import('@/actions/chat/process-private-chat.action');
+                result = await processPrivateChatAction(text, history, base64Files, leadId ?? undefined);
+            }
 
-            if (result.success && result.data) {
+            if (result.success) {
+                const replyText = result.response || "Entendido. Estoy procesando tu solicitud.";
                 const aiMsg: Message = {
                     id: (Date.now() + 1).toString(),
                     role: 'assistant',
-                    content: result.data.response,
+                    content: replyText,
                     createdAt: new Date(),
                 };
 
                 setMessages(prev => [...prev, aiMsg]);
-                setRequirements(result.data.updatedRequirements);
+
+                // Track requirements state (primarily for private mode, public handles it generically)
+                if (result.updatedRequirements) {
+                    setRequirements(result.updatedRequirements);
+                }
 
                 // Persist AI Message
                 const { sendMessageAction } = await import('@/actions/chat/send-message.action');
-                await sendMessageAction(conversationId, result.data.response, 'assistant', 'system');
+                await sendMessageAction(conversationId, replyText, 'assistant', 'system');
 
-                if (result.data.isComplete) {
+                if (result.isComplete && mode === 'private') {
                     setState('review');
                 } else {
                     setState('idle');

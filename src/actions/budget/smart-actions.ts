@@ -1,7 +1,7 @@
 'use server';
 
-import { ai } from '@/backend/ai/config/genkit.config';
-import { constructionAnalystAgent } from '@/backend/ai/agents/construction-analyst.agent';
+import { ai } from '@/backend/ai/core/config/genkit.config';
+import { constructionAnalystAgent } from '@/backend/ai/private/agents/construction-analyst.agent';
 import { z } from 'zod';
 
 /**

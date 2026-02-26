@@ -6,7 +6,7 @@ export default async function BudgetWizardPage() {
 
     return (
         <div className="flex flex-col h-[100dvh] w-full bg-background">
-            <BudgetWizardChat />
+            <BudgetWizardChat mode="private" />
         </div>
     );
 }

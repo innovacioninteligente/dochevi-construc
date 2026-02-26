@@ -7,7 +7,7 @@ async function runTest() {
     console.log('Starting Phase 3 Dynamic Decomposition Test...');
 
     // Dynamic import to ensuring dotenv is loaded FIRST
-    const { resolveItemFlow } = await import('@/backend/ai/agents/resolve-item.flow');
+    const { resolveItemFlow } = await import('@/backend/ai/private/flows/resolve-item.flow');
 
     // Test Case: "Build a brick wall" 
     // This is simple enough to verify LLM breakdown (bricks + mortar) 
@@ -23,7 +23,7 @@ async function runTest() {
         // To FORCE decomposition for this test, let's call the Analyst Agent DIRECTLY.
         // This isolates the Unit Test for the Analyst Agent.
 
-        const { constructionAnalystAgent } = await import('@/backend/ai/agents/construction-analyst.agent');
+        const { constructionAnalystAgent } = await import('@/backend/ai/private/agents/construction-analyst.agent');
 
         const result = await constructionAnalystAgent({
             description: input

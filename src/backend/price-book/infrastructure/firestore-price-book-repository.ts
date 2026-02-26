@@ -111,13 +111,14 @@ export class FirestorePriceBookRepository implements PriceBookRepository {
         return [];
     }
 
-    async searchByVector(embedding: number[], limit: number = 10, year?: number, keywordFilter?: string): Promise<(PriceBookItem & { matchScore: number })[]> {
+    async searchByVector(embedding: number[], limit: number = 10, year?: number, keywordFilter?: string, queryText?: string): Promise<(PriceBookItem & { matchScore: number })[]> {
         const collectionRef = this.db.collection('price_book_items');
 
         const vectorValue = FieldValue.vector(embedding);
 
-        // Hybrid Strategy: Fetch more candidates via Vector Search (Loose Net), then Re-rank via Keyword
-        const candidateLimit = keywordFilter ? limit * 3 : limit;
+        // RRF Hybrid Strategy: Fetch more candidates via Vector Search (Loose Net), then Re-rank via Keyword Fusion
+        const isRRF = queryText && queryText.trim().length > 0;
+        const candidateLimit = isRRF ? Math.max(limit * 5, 50) : (keywordFilter ? limit * 3 : limit);
 
         let vectorQuery = collectionRef.findNearest('embedding', vectorValue, {
             limit: candidateLimit,
@@ -159,34 +160,89 @@ export class FirestorePriceBookRepository implements PriceBookRepository {
             } as PriceBookItem & { matchScore: number };
         });
 
-        // Hybrid Re-ranking
-        if (keywordFilter && keywordFilter.trim().length > 0) {
-            const keywords = keywordFilter.toLowerCase().split(/\s+/).filter(k => k.length > 2); // Ignore small words
+        const normalizeText = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
+        // RRF Hybrid Re-ranking
+        if (isRRF && queryText) {
+            const K = 60;
+            const normalizeAndTokenize = (text: string): string[] => {
+                if (!text) return [];
+                const tokens = normalizeText(text).split(/\W+/).filter(t => t.length > 2);
+                return Array.from(new Set(tokens));
+            };
+
+            const computeKeywordScore = (qTokens: string[], docText: string): number => {
+                const docTokens = normalizeAndTokenize(docText);
+                let overlap = 0;
+                for (const q of qTokens) {
+                    if (docTokens.includes(q)) overlap++;
+                }
+                return qTokens.length > 0 ? overlap / qTokens.length : 0;
+            };
+
+            const queryTokens = normalizeAndTokenize(queryText);
+
+            // Rank 1: Semantic (Already sorted by vector search matchScore natively, but sorting to be 100% sure)
+            candidates.sort((a, b) => b.matchScore - a.matchScore);
+            const semanticRanked = [...candidates];
+
+            // Rank 2: Lexical (Keyword Matching)
+            const lexicalScored = candidates.map((item) => {
+                const fullText = `${item.description} ${item.chapter || ''} ${item.section || ''}`;
+                const lexicalScore = computeKeywordScore(queryTokens, fullText);
+                return { item, lexicalScore };
+            });
+
+            lexicalScored.sort((a, b) => b.lexicalScore - a.lexicalScore);
+
+            const lexicalRankMap = new Map<string, number>();
+            lexicalScored.forEach((entry, idx) => {
+                lexicalRankMap.set(entry.item.code, idx + 1);
+            });
+
+            const rrfResults = semanticRanked.map((item, semanticIdx) => {
+                const semanticRank = semanticIdx + 1;
+                const lexicalRank = lexicalRankMap.get(item.code) || candidateLimit;
+
+                const semanticRRF = 1 / (K + semanticRank);
+                const lexicalRRF = 1 / (K + lexicalRank);
+
+                // Weight Semantic much higher (85%) because construction vocabulary heavily diverges 
+                // between user layman terms and formal BBDD descriptions.
+                const finalRRFScore = (semanticRRF * 0.85) + (lexicalRRF * 0.15);
+
+                // If chapter filter exists, give it a tiny contextual tie-breaker boost
+                const chapterMatchBoost = (keywordFilter && item.chapter && item.chapter.toLowerCase() === keywordFilter.toLowerCase()) ? 0.001 : 0;
+
+                return {
+                    ...item,
+                    matchScore: finalRRFScore + chapterMatchBoost
+                };
+            });
+            candidates = rrfResults;
+
+        } else if (keywordFilter && keywordFilter.trim().length > 0) {
+            const keywords = normalizeText(keywordFilter).split(/\s+/).filter(k => k.length > 2);
             candidates = candidates.map(candidate => {
-                const text = (candidate.description || "").toLowerCase();
+                const descriptionText = normalizeText(candidate.description || "");
+                const chapterText = normalizeText(candidate.chapter || "");
+                const sectionText = normalizeText(candidate.section || "");
+                const fullTextToSearch = `${descriptionText} ${chapterText} ${sectionText}`;
+
                 let keywordScore = 0;
                 let matches = 0;
+                let taxonomyMatches = 0;
 
                 keywords.forEach(kw => {
-                    if (text.includes(kw)) {
-                        matches++;
-                        // Bonus for exact word match vs substring? 
-                        // Simple inclusion is fine for now.
-                    }
+                    if (fullTextToSearch.includes(kw)) matches++;
+                    if (chapterText.includes(kw) || sectionText.includes(kw)) taxonomyMatches++;
                 });
 
                 if (keywords.length > 0) {
-                    keywordScore = matches / keywords.length; // 0 to 1
+                    keywordScore = (matches / keywords.length) + (taxonomyMatches / keywords.length);
+                    return { ...candidate, matchScore: candidate.matchScore * (1 + 0.05 * keywordScore) };
                 }
-
-                // Weighted Score: Vector (Semantic) + Keyword (Exactness)
-                // We want to boost items that match keywords but still respect vector similarity
-                // New Score = Vector * (1 + 0.5 * KeywordScore)
-                return {
-                    ...candidate,
-                    matchScore: candidate.matchScore * (1 + 0.5 * keywordScore)
-                };
+                return candidate;
             });
         }
 

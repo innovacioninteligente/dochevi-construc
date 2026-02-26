@@ -1,5 +1,5 @@
 import 'dotenv/config'; // Load env vars before anything else
-import { constructionAnalystAgent } from '@/backend/ai/agents/construction-analyst.agent';
+import { constructionAnalystAgent } from '@/backend/ai/private/agents/construction-analyst.agent';
 import { initFirebaseAdminApp } from '@/backend/shared/infrastructure/firebase/admin-app';
 
 async function main() {

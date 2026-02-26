@@ -1,6 +1,6 @@
 'use server';
 
-import { clientRequirementsFlow } from '@/backend/ai/flows/client-requirements.flow';
+import { clientRequirementsFlow } from '@/backend/ai/public/flows/client-requirements.flow';
 import { BudgetRequirement } from '@/backend/budget/domain/budget-requirements';
 
 export async function processClientMessageAction(

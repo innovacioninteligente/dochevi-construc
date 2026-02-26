@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { measurementPricingFlow } from '@/backend/ai/flows/measurements/measurement-pricing.flow';
+import { measurementPricingFlow } from '@/backend/ai/private/flows/measurements/measurement-pricing.flow';
 
 export async function POST(request: NextRequest) {
     try {
@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
         const result = await measurementPricingFlow({
             pdfBase64: base64,
             mimeType: file.type,
+            useDeepSearch: true
         });
 
         return NextResponse.json({

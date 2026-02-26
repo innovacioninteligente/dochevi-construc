@@ -66,4 +66,27 @@ export class FirestoreLeadRepository implements LeadRepository {
         if (snapshot.empty) return null;
         return this.toDomain(snapshot.docs[0]);
     }
+
+    async search(query?: string): Promise<Lead[]> {
+        // Simple search that returns recent leads, potentially filtered if query is provided
+        // In a real app, this should use Algolia/Meilisearch for fuzzy search, but basic Firestore limit will do for MVP
+        let queryRef: FirebaseFirestore.Query = this.db.collection('leads')
+            .orderBy('createdAt', 'desc')
+            .limit(50);
+
+        const snapshot = await queryRef.get();
+
+        let leads = snapshot.docs.map(doc => this.toDomain(doc));
+
+        if (query && query.trim() !== '') {
+            const q = query.toLowerCase().trim();
+            leads = leads.filter(l =>
+                l.personalInfo.name.toLowerCase().includes(q) ||
+                l.personalInfo.email.toLowerCase().includes(q) ||
+                l.personalInfo.phone.includes(q)
+            );
+        }
+
+        return leads;
+    }
 }

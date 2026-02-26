@@ -1,6 +1,6 @@
 
 import 'dotenv/config';
-import { generateBudgetRecurseFlow } from '@/backend/ai/agents/generate-budget-recurse.flow';
+import { generateBudgetRecurseFlow } from '@/backend/ai/private/flows/generate-budget-recurse.flow';
 import { initFirebaseAdminApp } from '@/backend/shared/infrastructure/firebase/admin-app';
 
 async function runTest() {

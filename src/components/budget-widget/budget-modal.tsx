@@ -294,7 +294,7 @@ export function SmartBudgetModal({ dictionary }: { dictionary?: any }) {
             return <BudgetRequestWizard t={t} services={services} onBack={() => openWidget('general')} isWidget={true} />;
         }
         if (activeMode === 'chat') {
-            return <BudgetWizardChat />;
+            return <BudgetWizardChat mode="public" />;
         }
         // Fallback for Quick Budget or others
         return <QuickBudgetForm t={t} onBack={() => openWidget('general')} />;

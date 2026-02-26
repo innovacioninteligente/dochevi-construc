@@ -11,14 +11,16 @@ import { UnifiedCatalogItem } from '@/backend/catalog/domain/catalog-item';
 import { searchCatalogAction } from '@/actions/catalog/search-catalog.action';
 import { useToast } from '@/hooks/use-toast';
 import { EditableBudgetLineItem } from '@/types/budget-editor';
+import { formatMoneyEUR } from '@/lib/utils';
 
 interface SemanticCatalogSidebarProps {
     onAddItem: (item: Partial<EditableBudgetLineItem>) => void;
+    defaultTab?: 'ALL' | 'LABOR' | 'MATERIAL';
 }
 
-export const SemanticCatalogSidebar = ({ onAddItem }: SemanticCatalogSidebarProps) => {
+export const SemanticCatalogSidebar = ({ onAddItem, defaultTab = 'ALL' }: SemanticCatalogSidebarProps) => {
     const [search, setSearch] = useState('');
-    const [activeTab, setActiveTab] = useState<'ALL' | 'LABOR' | 'MATERIAL'>('ALL');
+    const [activeTab, setActiveTab] = useState<'ALL' | 'LABOR' | 'MATERIAL'>(defaultTab);
     const [items, setItems] = useState<UnifiedCatalogItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
@@ -125,37 +127,37 @@ export const SemanticCatalogSidebar = ({ onAddItem }: SemanticCatalogSidebarProp
                                 : "Busca partidas de obra o materiales de construcción."}
                         </div>
                     ) : (
-                        filteredItems.map((item) => (
+                        filteredItems.map((item, idx) => (
                             <div
-                                key={item.id}
+                                key={item.id || item.code || idx}
                                 className="group flex flex-col gap-2 p-3 rounded-lg border border-transparent hover:bg-slate-50 dark:hover:bg-white/5 hover:border-slate-100 dark:hover:border-white/5 transition-all cursor-default"
                             >
                                 <div className="flex justify-between items-start gap-2">
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 border ${item.type === 'LABOR'
-                                                    ? 'text-blue-600 border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800'
-                                                    : 'text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800'
+                                    <div className="flex-1 min-w-0 pr-4">
+                                        <div className="flex items-center gap-2 mb-1.5">
+                                            <Badge variant="outline" className={`text-[9px] uppercase tracking-wider font-semibold px-1.5 h-4 border-none rounded-sm ${item.type === 'LABOR'
+                                                ? 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400'
+                                                : 'text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400'
                                                 }`}>
-                                                {item.type === 'LABOR' ? <Hammer className="w-3 h-3 mr-1" /> : <ShoppingCart className="w-3 h-3 mr-1" />}
-                                                {item.type === 'LABOR' ? 'Partida' : 'Material'}
+                                                {item.type === 'LABOR' ? <Hammer className="w-2.5 h-2.5 mr-1" /> : <ShoppingCart className="w-2.5 h-2.5 mr-1" />}
+                                                {item.type === 'LABOR' ? 'PARTIDA' : 'MATERIAL'}
                                             </Badge>
                                         </div>
-                                        <h4 className="font-medium text-sm text-slate-700 dark:text-white leading-tight line-clamp-2" title={item.description}>
+                                        <h4 className="font-sans font-medium text-[13px] text-slate-800 dark:text-slate-200 leading-snug line-clamp-2" title={item.description}>
                                             {item.name}
                                         </h4>
                                     </div>
-                                    <span className="font-mono text-xs font-bold text-slate-600 dark:text-white/90 bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded whitespace-nowrap">
-                                        {item.price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                                    <span className="font-mono text-[13px] font-semibold text-slate-900 dark:text-white justify-end flex shrink-0">
+                                        {formatMoneyEUR(item.price)}
                                     </span>
                                 </div>
-                                <div className="flex justify-between items-end mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-slate-50 dark:border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <span className="text-[10px] text-slate-400 dark:text-white/30 font-mono truncate max-w-[120px]">
                                         {item.code} • {item.unit}
                                     </span>
                                     <Button
                                         size="sm"
-                                        className="h-7 text-xs"
+                                        className="h-6 text-[10px] uppercase font-semibold tracking-wider px-3 bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-sm"
                                         onClick={() => handleAdd(item)}
                                     >
                                         <Plus className="w-3 h-3 mr-1" /> Añadir

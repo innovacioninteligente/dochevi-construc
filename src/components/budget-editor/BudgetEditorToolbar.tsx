@@ -14,8 +14,7 @@ import {
     History
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PDFDownloadLink } from '@react-pdf/renderer';
-import { BudgetDocument } from '@/components/pdf/BudgetDocument';
+// BudgetPDFDocument and pdf() are imported dynamically inside handleGeneratePdf to avoid SSR hydration errors
 import { EditableBudgetLineItem } from '@/types/budget-editor';
 import { BudgetCostBreakdown } from '@/backend/budget/domain/budget';
 import React from 'react';
@@ -28,9 +27,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BookOpen } from "lucide-react";
 import { SemanticCatalogSidebar } from './SemanticCatalogSidebar';
+import { AssignLeadDialog } from './AssignLeadDialog';
+import { PersonalInfo } from '@/backend/lead/domain/lead';
 
 interface BudgetEditorToolbarProps {
     hasUnsavedChanges: boolean;
@@ -52,6 +53,11 @@ interface BudgetEditorToolbarProps {
     costBreakdown: BudgetCostBreakdown;
     budgetNumber: string;
     onAddItem: (item: any) => void;
+
+    // Lead assignment
+    currentLeadId?: string;
+    currentClientName?: string;
+    onAssignLead?: (leadId: string, clientSnapshot: PersonalInfo) => Promise<void>;
 }
 
 export const BudgetEditorToolbar = ({
@@ -69,7 +75,10 @@ export const BudgetEditorToolbar = ({
     items,
     costBreakdown,
     budgetNumber,
-    onAddItem
+    onAddItem,
+    currentLeadId,
+    currentClientName,
+    onAssignLead
 }: BudgetEditorToolbarProps) => {
     // Determine status text
     const statusText = isSaving ? 'Guardando...' :
@@ -87,6 +96,64 @@ export const BudgetEditorToolbar = ({
         </span>
     );
 
+    const [isPdfModalOpen, setIsPdfModalOpen] = React.useState(false);
+    const [isGeneratingPdf, setIsGeneratingPdf] = React.useState(false);
+    const [pdfGenerationStep, setPdfGenerationStep] = React.useState<string | null>(null);
+
+    const handleGeneratePdf = async () => {
+        setIsGeneratingPdf(true);
+        setPdfGenerationStep("Preparando modelo de datos matemáticos...");
+        try {
+            // Give React a tick to update the UI "Generating..." state before freezing the main thread
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            setPdfGenerationStep("Montando el renderizador de páginas vectoriales...");
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Dynamic import to avoid SSR hydration errors
+            const { pdf } = await import('@react-pdf/renderer');
+            const { BudgetPDFDocument } = await import('./pdf/BudgetPDFDocument');
+
+            const docElement = (
+                <BudgetPDFDocument
+                    data={{
+                        projectName: `Presupuesto ${budgetNumber}`,
+                        clientName: clientName || currentClientName || 'Cliente No Asignado',
+                        date: new Date().toLocaleDateString('es-ES'),
+                        items: items,
+                        chapters: Array.from(new Set(items.map(i => i.chapter).filter(Boolean) as string[])),
+                        costBreakdown: costBreakdown
+                    }}
+                />
+            );
+
+            setPdfGenerationStep("Compilando arquitectura del archivo PDF (este paso toma unos segundos)...");
+            const asPdf = pdf();
+            asPdf.updateContainer(docElement);
+            // .toBlob() is the heaviest calculation and will occupy the thread
+            const blob = await asPdf.toBlob();
+
+            setPdfGenerationStep("¡Completado! Lanzando la descarga segura...");
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Create a fake URL and click it
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Presupuesto-${budgetNumber}.pdf`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            setIsPdfModalOpen(false);
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+            // Optionally add a toast here if configured
+        } finally {
+            setIsGeneratingPdf(false);
+            setPdfGenerationStep(null);
+        }
+    };
+
     return (
         <>
             {/* TOP TOOLBAR (Adaptive) */}
@@ -99,6 +166,15 @@ export const BudgetEditorToolbar = ({
 
                 {/* RIGHT: Actions */}
                 <div className="flex items-center gap-2">
+                    {/* Assign Lead Button */}
+                    {onAssignLead && (
+                        <AssignLeadDialog
+                            currentLeadId={currentLeadId}
+                            currentClientName={currentClientName}
+                            onAssignLead={onAssignLead}
+                        />
+                    )}
+
                     {/* Library Button (Dialog) */}
                     <Dialog>
                         <DialogTrigger asChild>
@@ -108,12 +184,12 @@ export const BudgetEditorToolbar = ({
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-4xl h-[80vh] flex flex-col p-0 gap-0">
-                            <div className="p-4 border-b">
-                                <h2 className="text-lg font-semibold flex items-center gap-2">
+                            <DialogHeader className="p-4 border-b pb-4">
+                                <DialogTitle className="text-lg font-semibold flex items-center gap-2">
                                     <BookOpen className="w-5 h-5" />
                                     Biblioteca de Precios
-                                </h2>
-                            </div>
+                                </DialogTitle>
+                            </DialogHeader>
                             <div className="flex-1 overflow-hidden p-4 bg-slate-50/50">
                                 <SemanticCatalogSidebar onAddItem={(item) => {
                                     onAddItem(item);
@@ -122,6 +198,8 @@ export const BudgetEditorToolbar = ({
                             </div>
                         </DialogContent>
                     </Dialog>
+
+
 
                     {/* Compare Button */}
                     <Button
@@ -137,28 +215,42 @@ export const BudgetEditorToolbar = ({
                         Comparar
                     </Button>
 
-                    {/* PDF Export */}
-                    <PDFDownloadLink
-                        document={
-                            <BudgetDocument
-                                budgetNumber={budgetNumber}
-                                clientName={clientName}
-                                clientEmail=""
-                                clientAddress=""
-                                items={items}
-                                costBreakdown={costBreakdown}
-                                date={new Date().toLocaleDateString()}
-                            />
-                        }
-                        fileName={`Presupuesto-${budgetNumber}.pdf`}
-                    >
-                        {({ loading }) => (
-                            <Button variant="outline" size="sm" disabled={loading} className="hidden md:flex bg-white hover:bg-slate-50 border-slate-200 text-slate-700">
-                                {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <FileDown className="w-4 h-4 mr-2" />}
+                    {/* PDF Export (Lazy Modal) */}
+                    <Dialog open={isPdfModalOpen} onOpenChange={setIsPdfModalOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="hidden md:flex bg-white hover:bg-slate-50 border-slate-200 text-slate-700">
+                                <FileDown className="w-4 h-4 mr-2" />
                                 Exportar PDF
                             </Button>
-                        )}
-                    </PDFDownloadLink>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Generando Documento PDF</DialogTitle>
+                                <DialogDescription>
+                                    Este proceso puede tardar unos segundos dependiendo del tamaño del presupuesto.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex flex-col gap-4 p-6 bg-slate-50 rounded-lg border border-slate-100 mt-2 text-center">
+                                <FileDown className="w-12 h-12 text-slate-300 mx-auto" />
+                                <Button
+                                    onClick={handleGeneratePdf}
+                                    disabled={isGeneratingPdf}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                                >
+                                    {isGeneratingPdf ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Procesando Presupuesto...</>
+                                    ) : (
+                                        <><FileDown className="w-4 h-4 mr-2" /> Descargar Presupuesto Ahora</>
+                                    )}
+                                </Button>
+                                {isGeneratingPdf && pdfGenerationStep && (
+                                    <div className="text-xs font-mono text-slate-500 animate-pulse mt-2 p-2 bg-slate-100 rounded text-center">
+                                        &gt;_ {pdfGenerationStep}
+                                    </div>
+                                )}
+                            </div>
+                        </DialogContent>
+                    </Dialog>
 
                     {/* Save Button (Primary Action) */}
                     <Button

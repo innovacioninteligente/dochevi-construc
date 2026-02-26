@@ -7,7 +7,7 @@ async function runTest() {
     console.log('Starting Architect Test...');
 
     // Dynamic import
-    const { constructionArchitectAgent } = await import('@/backend/ai/agents/construction-architect.agent');
+    const { constructionArchitectAgent } = await import('@/backend/ai/private/agents/construction-architect.agent');
 
     const input = "Reforma integral de baño de 6m2 con cambio de bañera por plato de ducha y renovacion de instalaciones";
     console.log(`\nTesting Architect for: "${input}"\n`);

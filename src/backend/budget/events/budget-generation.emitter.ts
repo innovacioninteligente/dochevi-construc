@@ -6,7 +6,7 @@ export const budgetGenerationEmitter = new BudgetGenerationEmitter();
 
 export type GenerationEvent = {
   type: 'subtasks_extracted' | 'item_resolving' | 'item_resolved' | 'validation_start' | 'complete' | 'error' |
-  'chapter_start' | 'decomposition_start' | 'vector_search';
+  'chapter_start' | 'decomposition_start' | 'vector_search' | 'batch_progress';
   leadId: string; // To scope events to a specific user
   data: any;
   timestamp: number;

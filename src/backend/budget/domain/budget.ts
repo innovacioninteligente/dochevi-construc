@@ -19,6 +19,7 @@ export interface BudgetPartida {
   isRealCost?: boolean; // True if recalculated by Construction Analyst
   matchConfidence?: number; // 0-100 Score from Vector Search
   breakdown?: BudgetBreakdownComponent[]; // Detailed cost structure
+  matchedItem?: any; // The original DB matched item (e.g., PriceBookItem) for HITL referenced
   relatedMaterial?: {
     sku: string;
     name: string;
@@ -30,12 +31,15 @@ export interface BudgetPartida {
 
 export interface BudgetBreakdownComponent {
   code?: string;
-  concept: string; // e.g. "Mano de obra", "Material: Keraben Forest"
-  type: 'LABOR' | 'MATERIAL' | 'MACHINERY' | 'OTHER';
+  concept?: string; // e.g. "Mano de obra", "Material: Keraben Forest"
+  description?: string; // Used by raw JSON PriceBook
+  type?: 'LABOR' | 'MATERIAL' | 'MACHINERY' | 'OTHER';
+  unit?: string;
   price: number; // Unit price of this component
   yield?: number; // Rendimiento (e.g. 0.05 h/m2)
+  quantity?: number; // Used by raw JSON PriceBook
   waste?: number; // Merma % (only for materials)
-  total: number; // price * yield * (1+waste)
+  total?: number; // price * yield * (1+waste)
   isSubstituted?: boolean; // True if this component was swapped by AI
 }
 
@@ -127,8 +131,8 @@ export interface Budget {
 
 export interface BudgetRender {
   id: string;
-  url: string;
-  originalUrl?: string;
+  afterUrls: string[]; // Generated render URLs (or Base64 strings temporarily)
+  beforeUrls: string[]; // Original photo URLs (or Base64 strings temporarily)
   prompt: string;
   style: string;
   roomType: string;

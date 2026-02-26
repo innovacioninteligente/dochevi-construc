@@ -82,7 +82,7 @@ export const MultimediaStep = ({ form, t }: MultimediaStepProps) => {
             const base64Data = renovatorImage.split(',')[1];
 
             const result = await generateRenovationAction({
-                imageBuffer: base64Data,
+                imageBuffers: [base64Data],
                 roomType,
                 style,
                 additionalRequirements: promptContext,

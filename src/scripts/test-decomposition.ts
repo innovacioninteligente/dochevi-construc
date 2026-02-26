@@ -7,7 +7,7 @@ async function runTest() {
     console.log('Starting Decomposition Test...');
 
     // Dynamic import to ensuring dotenv is loaded FIRST
-    const { resolveItemFlow } = await import('@/backend/ai/agents/resolve-item.flow');
+    const { resolveItemFlow } = await import('@/backend/ai/private/flows/resolve-item.flow');
 
     // We use a query that forces Triage to pick 'estimationAgent' (artistic/custom),
     // which in turn triggers our new Decomposition logic in resolve-item.flow.ts
